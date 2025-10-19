@@ -1,0 +1,4 @@
+curl -X GET \
+    -H "APCA-API-KEY-ID: {AKJOWW6IXS5SQHS2FUC4YVVCXK}"  
+    -H "APCA-API-SECRET-KEY: {By9oxrxKqL1m13ngySLLxi4hx3BT1JjPY4X5jwYhPCz8}"  
+    https://{apiserver_domain}/v2/account
