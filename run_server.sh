@@ -32,20 +32,20 @@ fi
 # -----------------------------------------------------
 # Optional: Launch front-end (React or HTML)
 # -----------------------------------------------------
-if [ -d "alpaca-ui" ]; then
-  echo "🎨 Launching front-end (alpaca-ui)..."
-  cd alpaca-ui
-
-  if [ -f "package.json" ]; then
-    npm start &
-    FRONTEND_PID=$!
-  elif [ -f "index.html" ]; then
-    open index.html
-  fi
-
-  cd "$PROJECT_DIR"
+# Auto-open browser tabs
+if command -v open >/dev/null 2>&1; then
+  open "http://localhost:3000"
+  open "http://localhost:8000/docs"
+  echo "✅ Browser windows opened."
+else
+  echo "➡ Please open http://localhost:3000 manually."
+  echo "➡ And FastAPI docs at: http://localhost:8000/docs"
 fi
 
+echo ""
+echo "🟢 Everything is running!"
+echo "Backend PID: $SERVER_PID"
+echo "Frontend PID: $FRONTEND_PID"
 # -----------------------------------------------------
 # Auto-start trading bot via API
 # -----------------------------------------------------
