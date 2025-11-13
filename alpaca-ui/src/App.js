@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const SERVER = "http://localhost:8000";
+const SERVER = "https://caimeov1.onrender.com";
 
 function App() {
   const [logs, setLogs] = useState("");
