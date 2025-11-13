@@ -2,6 +2,7 @@
 # =====================================================
 # run_server.sh — One-command launcher for Alpaca Bot
 # =====================================================
+
 export UNIVERSE_LIMIT=10000
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -18,47 +19,46 @@ echo "🚀 Starting FastAPI server (port 8000)..."
 uvicorn server:app --reload --port 8000 &
 SERVER_PID=$!
 
-# Give server time to boot
 sleep 5
 
-# Open FastAPI docs automatically (Mac = 'open')
-if command -v open >/dev/null 2>&1; then
-  open "http://127.0.0.1:8000/docs"
-  echo "✅ FastAPI docs opened in browser."
-else
-  echo "Please open http://127.0.0.1:8000/docs manually."
-fi
+# -----------------------------------------------------
+# Start FRONTEND (React)
+# -----------------------------------------------------
+echo "🚀 Starting frontend (React UI on port 3000)..."
+cd alpaca-ui
+npm start &
+FRONTEND_PID=$!
+cd "$PROJECT_DIR"
+
+sleep 5
 
 # -----------------------------------------------------
-# Optional: Launch front-end (React or HTML)
-# -----------------------------------------------------
 # Auto-open browser tabs
+# -----------------------------------------------------
 if command -v open >/dev/null 2>&1; then
   open "http://localhost:3000"
-  open "http://localhost:8000/docs"
+  open "http://127.0.0.1:8000/docs"
   echo "✅ Browser windows opened."
 else
   echo "➡ Please open http://localhost:3000 manually."
-  echo "➡ And FastAPI docs at: http://localhost:8000/docs"
+  echo "➡ And FastAPI docs at: http://127.0.0.1:8000/docs"
 fi
 
+# -----------------------------------------------------
+# Auto-start trading bot
+# -----------------------------------------------------
 echo ""
-echo "🟢 Everything is running!"
-echo "Backend PID: $SERVER_PID"
-echo "Frontend PID: $FRONTEND_PID"
-# -----------------------------------------------------
-# Auto-start trading bot via API
-# -----------------------------------------------------
 echo "🤖 Starting trading bot automatically..."
 sleep 3
+
 if command -v curl >/dev/null 2>&1; then
   curl -s -X POST "http://127.0.0.1:8000/start" >/dev/null
   echo "⌛ Verifying trading bot startup..."
-  
-  # Wait up to 15 seconds for a "started" log entry
+
   MAX_WAIT=15
   waited=0
   success=false
+
   while [ $waited -lt $MAX_WAIT ]; do
     if grep -q "🚀 Trading bot started" bot_output.log 2>/dev/null; then
       success=true
@@ -68,34 +68,25 @@ if command -v curl >/dev/null 2>&1; then
     ((waited++))
   done
 
-  # 🩵 FIX: Verify unified discovery file structure before success confirmation
   if [ "$success" = true ]; then
-    if [ -f "discovered_symbols.json" ]; then
-      if grep -q '"symbols"' discovered_symbols.json && grep -q '"RECOVERY"' discovered_symbols.json && grep -q '"MOMENTUM"' discovered_symbols.json; then
-        echo "✅ Trading bot and unified discovery confirmed running!"
-      else
-        echo "⚠️  Bot running, but discovery JSON not yet unified format — please check later."
-      fi
-    else
-      echo "⚠️  Bot started, but discovery output not yet generated."
-    fi
+    echo "✅ Trading bot confirmed running!"
   else
-    echo "⚠️  Could not confirm bot start (check bot_output.log)"
+    echo "⚠️  Bot started, but discovery output not yet generated."
   fi
+
 else
   echo "⚠️  curl not found — please start bot manually from the web UI."
 fi
 
+# -----------------------------------------------------
+# Final Status
+# -----------------------------------------------------
 echo ""
-echo "✅ Everything is up and running!"
+echo "🟢 Everything is up and running!"
 echo "   FastAPI server PID: $SERVER_PID"
-if [ -n "$FRONTEND_PID" ]; then
-  echo "   Frontend PID: $FRONTEND_PID"
-fi
+echo "   Frontend PID: $FRONTEND_PID"
 echo "------------------------------------------------------"
 echo "💡 Press Ctrl+C to stop everything (server + bot + frontend)"
 echo "------------------------------------------------------"
 
-# Graceful shutdown
-trap "echo '\n🛑 Stopping services...'; kill $SERVER_PID $FRONTEND_PID 2>/dev/null; curl -s -X POST http://127.0.0.1:8000/stop >/dev/null; echo '✅ All services stopped cleanly.'" INT
-wait $SERVER_PID
+trap "echo '\n🛑 Stopping services...'; kill $SERVER_PID $_

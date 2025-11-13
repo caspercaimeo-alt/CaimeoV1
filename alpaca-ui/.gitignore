@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+echo "venv/" >> .gitignore
+echo "__pycache__/" >> .gitignore
+echo "*.log" >> .gitignore
+echo "*.tmp" >> .gitignore
+echo ".env" >> .gitignore
+
