@@ -1,0 +1,119 @@
+[
+  {
+    "symbol": "SMR",
+    "pe": -89.61702,
+    "eps": -1.19,
+    "eps_growth_pct": 732.9,
+    "avg_dollar_vol": 1353578344.56,
+    "last_price": 42.12,
+    "score": 2.588421248368949
+  },
+  {
+    "symbol": "RCUS",
+    "pe": -4.256959,
+    "eps": -3.14,
+    "eps_growth_pct": 310.3,
+    "avg_dollar_vol": 43497559.28,
+    "last_price": 19.88,
+    "score": 0.5058427550123111
+  },
+  {
+    "symbol": "QBTS",
+    "pe": -123.07693,
+    "eps": -1.03,
+    "eps_growth_pct": 41.8,
+    "avg_dollar_vol": 1935349280.0,
+    "last_price": 32.0,
+    "score": 0.36720438556766116
+  },
+  {
+    "symbol": "ARQT",
+    "pe": -25.459185,
+    "eps": -0.73,
+    "eps_growth_pct": 164.1,
+    "avg_dollar_vol": 299180415.05,
+    "last_price": 24.95,
+    "score": 0.13262785260108378
+  },
+  {
+    "symbol": "ERIC",
+    "pe": 12.35443,
+    "eps": 0.79,
+    "eps_growth_pct": 192.1,
+    "avg_dollar_vol": 591138253.4399999,
+    "last_price": 9.76,
+    "score": -0.02693008884335399
+  },
+  {
+    "symbol": "F",
+    "pe": 11.222222,
+    "eps": 1.17,
+    "eps_growth_pct": 172.70000000000002,
+    "avg_dollar_vol": 1226893210.53,
+    "last_price": 13.13,
+    "score": -0.08796158057739191
+  },
+  {
+    "symbol": "PONY",
+    "pe": -37.14019,
+    "eps": -0.9,
+    "eps_growth_pct": 75.9,
+    "avg_dollar_vol": 274430074.41,
+    "last_price": 21.87,
+    "score": -0.10012384143534239
+  },
+  {
+    "symbol": "CX",
+    "pe": 11.307692,
+    "eps": 0.91,
+    "eps_growth_pct": 72.89999999999999,
+    "avg_dollar_vol": 277003929.09,
+    "last_price": 10.29,
+    "score": -0.44238045910462565
+  },
+  {
+    "symbol": "PLUG",
+    "pe": -4.894737,
+    "eps": -2.15,
+    "eps_growth_pct": 21.4,
+    "avg_dollar_vol": 244161203.04,
+    "last_price": 2.79,
+    "score": -0.5140662559524745
+  },
+  {
+    "symbol": "UPWK",
+    "pe": 9.38919,
+    "eps": 1.85,
+    "eps_growth_pct": 43.6,
+    "avg_dollar_vol": 61127687.61000001,
+    "last_price": 17.37,
+    "score": -0.5331296066642707
+  },
+  {
+    "symbol": "HBAN",
+    "pe": 10.867133,
+    "eps": 1.43,
+    "eps_growth_pct": 24.2,
+    "avg_dollar_vol": 957747060.9,
+    "last_price": 15.54,
+    "score": -0.6120272898496939
+  },
+  {
+    "symbol": "RF",
+    "pe": 10.69163,
+    "eps": 2.27,
+    "eps_growth_pct": 22.8,
+    "avg_dollar_vol": 1280923249.23,
+    "last_price": 24.27,
+    "score": -0.615789592503333
+  },
+  {
+    "symbol": "PYPL",
+    "pe": 15.635973,
+    "eps": 4.67,
+    "eps_growth_pct": 19.400000000000002,
+    "avg_dollar_vol": 6083903580.36,
+    "last_price": 73.02,
+    "score": -0.6616875266195182
+  }
+]

@@ -1,0 +1,743 @@
+[2025-10-18 18:46:07] Starting continuous trading bot...
+[2025-10-18 18:46:08] Not enough data for AAPL
+[2025-10-18 18:46:08] Not enough data for MSFT
+[2025-10-18 18:46:08] Not enough data for TSLA
+[2025-10-18 18:46:08] Sleeping for 60 seconds...
+
+[2025-10-18 18:47:08] Not enough data for AAPL
+[2025-10-18 18:47:08] Not enough data for MSFT
+[2025-10-18 18:47:08] Not enough data for TSLA
+[2025-10-18 18:47:08] Sleeping for 60 seconds...
+
+[2025-10-18 18:48:08] Not enough data for AAPL
+[2025-10-18 18:48:08] Not enough data for MSFT
+[2025-10-18 18:48:08] Not enough data for TSLA
+[2025-10-18 18:48:08] Sleeping for 60 seconds...
+
+[2025-10-18 18:49:08] Not enough data for AAPL
+[2025-10-18 18:49:08] Not enough data for MSFT
+[2025-10-18 18:49:08] Not enough data for TSLA
+[2025-10-18 18:49:08] Sleeping for 60 seconds...
+
+[2025-10-18 19:13:55] Starting trading bot (LIVE_MODE=False)
+[2025-10-18 19:13:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:13:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:13:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:14:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:14:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:14:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:15:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:15:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:15:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:16:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:16:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:16:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:17:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:17:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:17:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:18:56] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:18:56] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:18:56] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:19:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:19:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:19:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:20:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:20:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:20:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:21:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:21:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:21:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:22:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:22:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:22:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:23:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:23:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:23:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:24:57] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:24:57] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:24:57] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:25:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:25:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:25:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:26:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:26:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:26:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:27:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:27:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:27:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:28:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:28:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:28:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:29:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:29:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:29:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:30:58] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:30:58] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:30:58] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:31:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:31:59] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:31:59] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:32:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:32:59] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:32:59] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:33:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:33:59] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:33:59] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:34:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:34:59] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:34:59] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:35:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:35:59] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:35:59] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:36:59] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:37:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:37:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:38:00] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:38:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:38:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:39:00] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:39:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:39:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:40:00] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:40:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:40:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:41:00] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:41:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:41:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:42:00] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:42:00] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:42:00] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:43:01] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:43:01] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:43:01] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:44:01] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:44:01] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:44:01] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:01] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:01] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:01] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:10] Bot started successfully
+[2025-10-18 19:45:10] Starting trading bot (LIVE_MODE=False)
+[2025-10-18 19:45:10] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:10] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:45:10] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:46:10] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:46:10] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:46:10] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:47:10] Bot started successfully
+[2025-10-18 19:47:10] Starting trading bot (LIVE_MODE=False)
+[2025-10-18 19:47:10] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:47:11] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:47:11] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:48:11] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:48:11] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:48:11] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:49:11] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:49:11] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:49:11] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:11] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:11] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:11] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:18] Bot started successfully
+[2025-10-18 19:50:18] Starting trading bot (LIVE_MODE=False)
+[2025-10-18 19:50:19] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:19] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:50:19] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:51:19] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:51:19] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:51:19] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:52:19] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:52:19] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:52:19] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:53:19] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:53:19] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:53:19] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-18 19:53:42] Bot started successfully
+[2025-10-18 19:53:42] Starting trading bot (LIVE_MODE=False)
+[2025-10-18 19:53:43] Error processing AAPL: 'close'
+[2025-10-18 19:53:43] Error processing MSFT: 'close'
+[2025-10-18 19:53:43] Error processing TSLA: 'close'
+[2025-10-18 19:54:43] Error processing AAPL: 'close'
+[2025-10-18 19:54:43] Error processing MSFT: 'close'
+[2025-10-18 19:54:43] Error processing TSLA: 'close'
+[2025-10-18 19:55:43] Error processing AAPL: 'close'
+[2025-10-18 19:55:43] Error processing MSFT: 'close'
+[2025-10-18 19:55:43] Error processing TSLA: 'close'
+[2025-10-18 19:56:43] Error processing AAPL: 'close'
+[2025-10-18 19:56:43] Error processing MSFT: 'close'
+[2025-10-18 19:56:43] Error processing TSLA: 'close'
+[2025-10-18 19:57:44] Error processing AAPL: 'close'
+[2025-10-18 19:57:44] Error processing MSFT: 'close'
+[2025-10-18 19:57:44] Error processing TSLA: 'close'
+[2025-10-18 19:58:44] Error processing AAPL: 'close'
+[2025-10-18 19:58:44] Error processing MSFT: 'close'
+[2025-10-18 19:58:44] Error processing TSLA: 'close'
+[2025-10-18 19:59:44] Error processing AAPL: 'close'
+[2025-10-18 19:59:44] Error processing MSFT: 'close'
+[2025-10-18 19:59:44] Error processing TSLA: 'close'
+[2025-10-18 20:00:44] Error processing AAPL: 'close'
+[2025-10-18 20:00:44] Error processing MSFT: 'close'
+[2025-10-18 20:00:44] Error processing TSLA: 'close'
+[2025-10-18 20:01:44] Error processing AAPL: 'close'
+[2025-10-18 20:01:44] Error processing MSFT: 'close'
+[2025-10-18 20:01:44] Error processing TSLA: 'close'
+[2025-10-18 20:02:44] Error processing AAPL: 'close'
+[2025-10-18 20:02:45] Error processing MSFT: 'close'
+[2025-10-18 20:02:45] Error processing TSLA: 'close'
+[2025-10-18 20:03:45] Heartbeat: bot is alive.
+[2025-10-18 20:03:45] Error processing AAPL: 'close'
+[2025-10-18 20:03:45] Error processing MSFT: 'close'
+[2025-10-18 20:03:45] Error processing TSLA: 'close'
+[2025-10-18 20:04:45] Error processing AAPL: 'close'
+[2025-10-18 20:04:45] Error processing MSFT: 'close'
+[2025-10-18 20:04:45] Error processing TSLA: 'close'
+[2025-10-18 20:05:45] Error processing AAPL: 'close'
+[2025-10-18 20:05:45] Error processing MSFT: 'close'
+[2025-10-18 20:05:45] Error processing TSLA: 'close'
+[2025-10-18 20:06:45] Error processing AAPL: 'close'
+[2025-10-18 20:06:45] Error processing MSFT: 'close'
+[2025-10-18 20:06:45] Error processing TSLA: 'close'
+[2025-10-18 20:07:45] Error processing AAPL: 'close'
+[2025-10-18 20:07:46] Error processing MSFT: 'close'
+[2025-10-18 20:07:46] Error processing TSLA: 'close'
+[2025-10-18 20:08:46] Error processing AAPL: 'close'
+[2025-10-18 20:08:46] Error processing MSFT: 'close'
+[2025-10-18 20:08:46] Error processing TSLA: 'close'
+[2025-10-18 20:09:46] Error processing AAPL: 'close'
+[2025-10-18 20:09:46] Error processing MSFT: 'close'
+[2025-10-18 20:09:46] Error processing TSLA: 'close'
+[2025-10-18 20:10:46] Error processing AAPL: 'close'
+[2025-10-18 20:10:46] Error processing MSFT: 'close'
+[2025-10-18 20:10:46] Error processing TSLA: 'close'
+[2025-10-18 20:11:46] Error processing AAPL: 'close'
+[2025-10-18 20:11:46] Error processing MSFT: 'close'
+[2025-10-18 20:11:46] Error processing TSLA: 'close'
+[2025-10-18 20:12:47] Error processing AAPL: 'close'
+[2025-10-18 20:12:47] Error processing MSFT: 'close'
+[2025-10-18 20:12:47] Error processing TSLA: 'close'
+[2025-10-18 20:13:47] Heartbeat: bot is alive.
+[2025-10-18 20:13:47] Error processing AAPL: 'close'
+[2025-10-18 20:13:47] Error processing MSFT: 'close'
+[2025-10-18 20:13:47] Error processing TSLA: 'close'
+[2025-10-18 20:14:47] Error processing AAPL: 'close'
+[2025-10-18 20:14:47] Error processing MSFT: 'close'
+[2025-10-18 20:14:47] Error processing TSLA: 'close'
+[2025-10-18 20:15:47] Error processing AAPL: 'close'
+[2025-10-18 20:15:47] Error processing MSFT: 'close'
+[2025-10-18 20:15:47] Error processing TSLA: 'close'
+[2025-10-18 20:16:47] Error processing AAPL: 'close'
+[2025-10-18 20:16:47] Error processing MSFT: 'close'
+[2025-10-18 20:16:47] Error processing TSLA: 'close'
+[2025-10-18 20:17:47] Error processing AAPL: 'close'
+[2025-10-18 20:17:48] Error processing MSFT: 'close'
+[2025-10-18 20:17:48] Error processing TSLA: 'close'
+[2025-10-18 20:18:48] Error processing AAPL: 'close'
+[2025-10-18 20:18:48] Error processing MSFT: 'close'
+[2025-10-18 20:18:48] Error processing TSLA: 'close'
+[2025-10-18 20:19:48] Error processing AAPL: 'close'
+[2025-10-18 20:19:48] Error processing MSFT: 'close'
+[2025-10-18 20:19:48] Error processing TSLA: 'close'
+[2025-10-18 20:20:48] Error processing AAPL: 'close'
+[2025-10-18 20:20:48] Error processing MSFT: 'close'
+[2025-10-18 20:20:48] Error processing TSLA: 'close'
+[2025-10-18 20:21:48] Error processing AAPL: 'close'
+[2025-10-18 20:21:48] Error processing MSFT: 'close'
+[2025-10-18 20:21:48] Error processing TSLA: 'close'
+[2025-10-18 20:22:48] Error processing AAPL: 'close'
+[2025-10-18 20:22:48] Error processing MSFT: 'close'
+[2025-10-18 20:22:49] Error processing TSLA: 'close'
+[2025-10-18 20:23:49] Heartbeat: bot is alive.
+[2025-10-18 20:23:49] Error processing AAPL: 'close'
+[2025-10-18 20:23:49] Error processing MSFT: 'close'
+[2025-10-18 20:23:49] Error processing TSLA: 'close'
+[2025-10-18 20:24:49] Error processing AAPL: 'close'
+[2025-10-18 20:24:49] Error processing MSFT: 'close'
+[2025-10-18 20:24:49] Error processing TSLA: 'close'
+[2025-10-18 20:25:49] Error processing AAPL: 'close'
+[2025-10-18 20:25:49] Error processing MSFT: 'close'
+[2025-10-18 20:25:49] Error processing TSLA: 'close'
+[2025-10-18 20:26:49] Error processing AAPL: 'close'
+[2025-10-18 20:26:49] Error processing MSFT: 'close'
+[2025-10-18 20:26:49] Error processing TSLA: 'close'
+[2025-10-18 20:27:49] Error processing AAPL: 'close'
+[2025-10-18 20:27:49] Error processing MSFT: 'close'
+[2025-10-18 20:27:49] Error processing TSLA: 'close'
+[2025-10-18 20:28:50] Error processing AAPL: 'close'
+[2025-10-18 20:28:50] Error processing MSFT: 'close'
+[2025-10-18 20:28:50] Error processing TSLA: 'close'
+[2025-10-18 20:29:50] Error processing AAPL: 'close'
+[2025-10-18 20:29:50] Error processing MSFT: 'close'
+[2025-10-18 20:29:50] Error processing TSLA: 'close'
+[2025-10-18 20:30:50] Error processing AAPL: 'close'
+[2025-10-18 20:30:50] Error processing MSFT: 'close'
+[2025-10-18 20:30:50] Error processing TSLA: 'close'
+[2025-10-18 20:31:50] Error processing AAPL: 'close'
+[2025-10-18 20:31:50] Error processing MSFT: 'close'
+[2025-10-18 20:31:50] Error processing TSLA: 'close'
+[2025-10-18 20:32:50] Error processing AAPL: 'close'
+[2025-10-18 20:32:50] Error processing MSFT: 'close'
+[2025-10-18 20:32:50] Error processing TSLA: 'close'
+[2025-10-18 20:33:50] Heartbeat: bot is alive.
+[2025-10-18 20:33:51] Error processing AAPL: 'close'
+[2025-10-18 20:33:51] Error processing MSFT: 'close'
+[2025-10-18 20:33:51] Error processing TSLA: 'close'
+[2025-10-18 20:34:51] Error processing AAPL: 'close'
+[2025-10-18 20:34:51] Error processing MSFT: 'close'
+[2025-10-18 20:34:51] Error processing TSLA: 'close'
+[2025-10-18 20:35:51] Error processing AAPL: 'close'
+[2025-10-18 20:35:51] Error processing MSFT: 'close'
+[2025-10-18 20:35:51] Error processing TSLA: 'close'
+[2025-10-18 20:36:51] Error processing AAPL: 'close'
+[2025-10-18 20:36:51] Error processing MSFT: 'close'
+[2025-10-18 20:36:51] Error processing TSLA: 'close'
+[2025-10-18 20:37:51] Error processing AAPL: 'close'
+[2025-10-18 20:37:51] Error processing MSFT: 'close'
+[2025-10-18 20:37:51] Error processing TSLA: 'close'
+[2025-10-18 20:38:51] Error processing AAPL: 'close'
+[2025-10-18 20:38:52] Error processing MSFT: 'close'
+[2025-10-18 20:38:52] Error processing TSLA: 'close'
+[2025-10-18 20:39:52] Error processing AAPL: 'close'
+[2025-10-18 20:39:52] Error processing MSFT: 'close'
+[2025-10-18 20:39:52] Error processing TSLA: 'close'
+[2025-10-18 20:40:52] Error processing AAPL: 'close'
+[2025-10-18 20:40:52] Error processing MSFT: 'close'
+[2025-10-18 20:40:52] Error processing TSLA: 'close'
+[2025-10-18 20:41:52] Error processing AAPL: 'close'
+[2025-10-18 20:41:52] Error processing MSFT: 'close'
+[2025-10-18 20:41:52] Error processing TSLA: 'close'
+[2025-10-18 20:42:52] Error processing AAPL: 'close'
+[2025-10-18 20:42:52] Error processing MSFT: 'close'
+[2025-10-18 20:42:53] Error processing TSLA: 'close'
+[2025-10-18 20:43:53] Heartbeat: bot is alive.
+[2025-10-18 20:43:53] Error processing AAPL: 'close'
+[2025-10-18 20:43:53] Error processing MSFT: 'close'
+[2025-10-18 20:43:53] Error processing TSLA: 'close'
+[2025-10-18 20:44:53] Error processing AAPL: 'close'
+[2025-10-18 20:44:53] Error processing MSFT: 'close'
+[2025-10-18 20:44:53] Error processing TSLA: 'close'
+[2025-10-18 20:45:53] Error processing AAPL: 'close'
+[2025-10-18 20:45:53] Error processing MSFT: 'close'
+[2025-10-18 20:45:53] Error processing TSLA: 'close'
+[2025-10-18 20:46:53] Error processing AAPL: 'close'
+[2025-10-18 20:46:53] Error processing MSFT: 'close'
+[2025-10-18 20:46:53] Error processing TSLA: 'close'
+[2025-10-18 20:47:53] Error processing AAPL: 'close'
+[2025-10-18 20:47:53] Error processing MSFT: 'close'
+[2025-10-18 20:47:54] Error processing TSLA: 'close'
+[2025-10-18 20:48:54] Error processing AAPL: 'close'
+[2025-10-18 20:48:54] Error processing MSFT: 'close'
+[2025-10-18 20:48:54] Error processing TSLA: 'close'
+[2025-10-18 20:49:54] Error processing AAPL: 'close'
+[2025-10-18 20:49:54] Error processing MSFT: 'close'
+[2025-10-18 20:49:54] Error processing TSLA: 'close'
+[2025-10-18 20:50:54] Error processing AAPL: 'close'
+[2025-10-18 20:50:54] Error processing MSFT: 'close'
+[2025-10-18 20:50:54] Error processing TSLA: 'close'
+[2025-10-18 20:51:54] Error processing AAPL: 'close'
+[2025-10-18 20:51:54] Error processing MSFT: 'close'
+[2025-10-18 20:51:54] Error processing TSLA: 'close'
+[2025-10-18 20:52:54] Error processing AAPL: 'close'
+[2025-10-18 20:52:54] Error processing MSFT: 'close'
+[2025-10-18 20:52:55] Error processing TSLA: 'close'
+[2025-10-18 20:53:55] Heartbeat: bot is alive.
+[2025-10-18 20:53:55] Error processing AAPL: 'close'
+[2025-10-18 20:53:55] Error processing MSFT: 'close'
+[2025-10-18 20:53:55] Error processing TSLA: 'close'
+[2025-10-18 20:54:55] Error processing AAPL: 'close'
+[2025-10-18 20:54:55] Error processing MSFT: 'close'
+[2025-10-18 20:54:55] Error processing TSLA: 'close'
+[2025-10-18 20:55:55] Error processing AAPL: 'close'
+[2025-10-18 20:55:55] Error processing MSFT: 'close'
+[2025-10-18 20:55:56] Error processing TSLA: 'close'
+[2025-10-18 20:56:04] Bot started successfully
+[2025-10-18 20:56:04] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 20:56:04] No intraday data for AAPL. Falling back to daily bars.
+[2025-10-18 20:56:04] No bar data returned for "AAPL" after fallback.
+[2025-10-18 20:56:04] No intraday data for MSFT. Falling back to daily bars.
+[2025-10-18 20:56:04] No bar data returned for "MSFT" after fallback.
+[2025-10-18 20:56:04] No intraday data for TSLA. Falling back to daily bars.
+[2025-10-18 20:56:04] No bar data returned for "TSLA" after fallback.
+[2025-10-18 20:56:56] Error processing AAPL: 'close'
+[2025-10-18 20:56:56] Error processing MSFT: 'close'
+[2025-10-18 20:56:56] Error processing TSLA: 'close'
+[2025-10-18 20:57:04] No intraday data for AAPL. Falling back to daily bars.
+[2025-10-18 20:57:04] No bar data returned for "AAPL" after fallback.
+[2025-10-18 20:57:04] No intraday data for MSFT. Falling back to daily bars.
+[2025-10-18 20:57:04] No bar data returned for "MSFT" after fallback.
+[2025-10-18 20:57:04] No intraday data for TSLA. Falling back to daily bars.
+[2025-10-18 20:57:05] No bar data returned for "TSLA" after fallback.
+[2025-10-18 20:57:56] Error processing AAPL: 'close'
+[2025-10-18 20:57:56] Error processing MSFT: 'close'
+[2025-10-18 20:57:56] Error processing TSLA: 'close'
+[2025-10-18 20:58:05] No intraday data for AAPL. Falling back to daily bars.
+[2025-10-18 20:58:05] No bar data returned for "AAPL" after fallback.
+[2025-10-18 20:58:05] No intraday data for MSFT. Falling back to daily bars.
+[2025-10-18 20:58:05] No bar data returned for "MSFT" after fallback.
+[2025-10-18 20:58:05] No intraday data for TSLA. Falling back to daily bars.
+[2025-10-18 20:58:05] No bar data returned for "TSLA" after fallback.
+[2025-10-18 20:58:56] Error processing AAPL: 'close'
+[2025-10-18 20:58:56] Error processing MSFT: 'close'
+[2025-10-18 20:58:56] Error processing TSLA: 'close'
+[2025-10-18 20:59:05] No intraday data for AAPL. Falling back to daily bars.
+[2025-10-18 20:59:05] No bar data returned for "AAPL" after fallback.
+[2025-10-18 20:59:05] No intraday data for MSFT. Falling back to daily bars.
+[2025-10-18 20:59:05] No bar data returned for "MSFT" after fallback.
+[2025-10-18 20:59:05] No intraday data for TSLA. Falling back to daily bars.
+[2025-10-18 20:59:05] No bar data returned for "TSLA" after fallback.
+[2025-10-18 20:59:56] Error processing AAPL: 'close'
+[2025-10-18 20:59:56] Error processing MSFT: 'close'
+[2025-10-18 20:59:56] Error processing TSLA: 'close'
+[2025-10-18 21:00:57] Error processing AAPL: 'close'
+[2025-10-18 21:00:57] Error processing MSFT: 'close'
+[2025-10-18 21:00:57] Error processing TSLA: 'close'
+[2025-10-18 21:10:25] ✅ Bot started successfully
+[2025-10-18 21:10:25] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 21:10:26] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:10:26] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 21:10:26] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:10:26] No data available for AAPL after fallback.
+[2025-10-18 21:10:26] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:10:26] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 21:10:26] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:10:26] No data available for MSFT after fallback.
+[2025-10-18 21:10:26] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:10:26] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 21:10:26] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:10:26] No data available for TSLA after fallback.
+[2025-10-18 21:11:26] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:11:26] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 21:11:26] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:11:26] No data available for AAPL after fallback.
+[2025-10-18 21:11:26] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:11:26] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 21:11:26] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:11:26] No data available for MSFT after fallback.
+[2025-10-18 21:11:26] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:11:26] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 21:11:26] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:11:26] No data available for TSLA after fallback.
+[2025-10-18 21:12:27] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:12:27] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 21:12:27] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 21:12:27] No data available for AAPL after fallback.
+[2025-10-18 21:12:27] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:12:27] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 21:12:27] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 21:12:27] No data available for MSFT after fallback.
+[2025-10-18 21:12:27] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:12:27] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 21:12:27] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 21:12:27] No data available for TSLA after fallback.
+[2025-10-18 22:07:07] ✅ Bot started successfully
+[2025-10-18 22:07:07] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 22:07:08] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 22:07:08] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 22:07:08] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 22:07:08] No data available for AAPL after fallback.
+[2025-10-18 22:07:08] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 22:07:08] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 22:07:08] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 22:07:08] No data available for MSFT after fallback.
+[2025-10-18 22:07:08] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 22:07:08] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 22:07:08] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 22:07:08] No data available for TSLA after fallback.
+[2025-10-18 22:07:29] ✅ Bot started successfully
+[2025-10-18 22:07:29] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 22:07:29] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 22:07:29] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 22:07:29] No bar data returned for "AAPL" (missing 'close' column)
+[2025-10-18 22:07:29] No data available for AAPL after fallback.
+[2025-10-18 22:07:29] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 22:07:29] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 22:07:29] No bar data returned for "MSFT" (missing 'close' column)
+[2025-10-18 22:07:29] No data available for MSFT after fallback.
+[2025-10-18 22:07:29] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 22:07:29] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 22:07:29] No bar data returned for "TSLA" (missing 'close' column)
+[2025-10-18 22:07:29] No data available for TSLA after fallback.
+[2025-10-18 22:27:09] ✅ Bot started successfully
+[2025-10-18 22:27:09] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 22:27:09] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 22:27:09] No data available for AAPL after fallback.
+[2025-10-18 22:27:09] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 22:27:09] No data available for MSFT after fallback.
+[2025-10-18 22:27:09] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 22:27:09] No data available for TSLA after fallback.
+[2025-10-18 22:28:09] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 22:28:09] No data available for AAPL after fallback.
+[2025-10-18 22:28:09] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 22:28:09] No data available for MSFT after fallback.
+[2025-10-18 22:28:10] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 22:28:10] No data available for TSLA after fallback.
+[2025-10-18 23:10:30] ✅ Bot started successfully
+[2025-10-18 23:10:30] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-18 23:10:31] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 23:10:31] No data available for AAPL after fallback.
+[2025-10-18 23:10:31] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 23:10:31] No data available for MSFT after fallback.
+[2025-10-18 23:10:31] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 23:10:31] No data available for TSLA after fallback.
+[2025-10-18 23:11:31] No intraday data for AAPL. Trying daily bars...
+[2025-10-18 23:11:31] No data available for AAPL after fallback.
+[2025-10-18 23:11:31] No intraday data for MSFT. Trying daily bars...
+[2025-10-18 23:11:31] No data available for MSFT after fallback.
+[2025-10-18 23:11:31] No intraday data for TSLA. Trying daily bars...
+[2025-10-18 23:11:31] No data available for TSLA after fallback.
+[2025-10-19 00:10:04] ✅ Bot started successfully
+[2025-10-19 00:10:04] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-19 00:10:04] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:10:05] No data available for AAPL after fallback.
+[2025-10-19 00:10:05] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:10:05] No data available for MSFT after fallback.
+[2025-10-19 00:10:05] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:10:05] No data available for TSLA after fallback.
+[2025-10-19 00:10:11] ✅ Bot started successfully
+[2025-10-19 00:10:11] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-19 00:10:13] ✅ Bot started successfully
+[2025-10-19 00:10:13] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-19 00:10:14] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:10:14] No data available for AAPL after fallback.
+[2025-10-19 00:10:14] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:10:14] No data available for MSFT after fallback.
+[2025-10-19 00:10:14] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:10:14] No data available for TSLA after fallback.
+[2025-10-19 00:11:14] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:11:14] No data available for AAPL after fallback.
+[2025-10-19 00:11:14] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:11:14] No data available for MSFT after fallback.
+[2025-10-19 00:11:14] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:11:14] No data available for TSLA after fallback.
+[2025-10-19 00:12:14] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:12:14] No data available for AAPL after fallback.
+[2025-10-19 00:12:14] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:12:15] No data available for MSFT after fallback.
+[2025-10-19 00:12:15] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:12:15] No data available for TSLA after fallback.
+[2025-10-19 00:13:15] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:13:15] No data available for AAPL after fallback.
+[2025-10-19 00:13:15] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:13:15] No data available for MSFT after fallback.
+[2025-10-19 00:13:15] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:13:15] No data available for TSLA after fallback.
+[2025-10-19 00:14:15] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:14:15] No data available for AAPL after fallback.
+[2025-10-19 00:14:15] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:14:15] No data available for MSFT after fallback.
+[2025-10-19 00:14:15] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:14:15] No data available for TSLA after fallback.
+[2025-10-19 00:15:15] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:15:15] No data available for AAPL after fallback.
+[2025-10-19 00:15:16] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:15:16] No data available for MSFT after fallback.
+[2025-10-19 00:15:16] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:15:16] No data available for TSLA after fallback.
+[2025-10-19 00:16:16] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:16:16] No data available for AAPL after fallback.
+[2025-10-19 00:16:16] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:16:16] No data available for MSFT after fallback.
+[2025-10-19 00:16:16] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:16:16] No data available for TSLA after fallback.
+[2025-10-19 00:17:16] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:17:16] No data available for AAPL after fallback.
+[2025-10-19 00:17:16] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:17:16] No data available for MSFT after fallback.
+[2025-10-19 00:17:16] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:17:16] No data available for TSLA after fallback.
+[2025-10-19 00:18:17] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:18:17] No data available for AAPL after fallback.
+[2025-10-19 00:18:17] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:18:17] No data available for MSFT after fallback.
+[2025-10-19 00:18:17] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:18:17] No data available for TSLA after fallback.
+[2025-10-19 00:19:17] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:19:17] No data available for AAPL after fallback.
+[2025-10-19 00:19:17] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:19:17] No data available for MSFT after fallback.
+[2025-10-19 00:19:17] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:19:17] No data available for TSLA after fallback.
+[2025-10-19 00:20:17] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:20:17] No data available for AAPL after fallback.
+[2025-10-19 00:20:17] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:20:18] No data available for MSFT after fallback.
+[2025-10-19 00:20:18] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:20:18] No data available for TSLA after fallback.
+[2025-10-19 00:21:18] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:21:18] No data available for AAPL after fallback.
+[2025-10-19 00:21:18] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:21:18] No data available for MSFT after fallback.
+[2025-10-19 00:21:18] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:21:18] No data available for TSLA after fallback.
+[2025-10-19 00:22:18] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:22:18] No data available for AAPL after fallback.
+[2025-10-19 00:22:19] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:22:19] No data available for MSFT after fallback.
+[2025-10-19 00:22:19] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:22:19] No data available for TSLA after fallback.
+[2025-10-19 00:23:19] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:23:19] No data available for AAPL after fallback.
+[2025-10-19 00:23:19] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:23:19] No data available for MSFT after fallback.
+[2025-10-19 00:23:19] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:23:19] No data available for TSLA after fallback.
+[2025-10-19 00:24:19] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:24:19] No data available for AAPL after fallback.
+[2025-10-19 00:24:19] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:24:19] No data available for MSFT after fallback.
+[2025-10-19 00:24:20] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:24:20] No data available for TSLA after fallback.
+[2025-10-19 00:25:20] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:25:20] No data available for AAPL after fallback.
+[2025-10-19 00:25:20] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:25:20] No data available for MSFT after fallback.
+[2025-10-19 00:25:20] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:25:20] No data available for TSLA after fallback.
+[2025-10-19 00:26:20] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:26:20] No data available for AAPL after fallback.
+[2025-10-19 00:26:20] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:26:20] No data available for MSFT after fallback.
+[2025-10-19 00:26:20] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:26:20] No data available for TSLA after fallback.
+[2025-10-19 00:27:21] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:27:21] No data available for AAPL after fallback.
+[2025-10-19 00:27:22] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:27:22] No data available for MSFT after fallback.
+[2025-10-19 00:27:23] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:27:23] No data available for TSLA after fallback.
+[2025-10-19 00:28:25] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:28:25] No data available for AAPL after fallback.
+[2025-10-19 00:28:26] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:28:27] No data available for MSFT after fallback.
+[2025-10-19 00:28:27] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:28:28] No data available for TSLA after fallback.
+[2025-10-19 00:29:28] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:29:28] No data available for AAPL after fallback.
+[2025-10-19 00:29:28] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:29:28] No data available for MSFT after fallback.
+[2025-10-19 00:29:29] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:29:29] No data available for TSLA after fallback.
+[2025-10-19 00:30:33] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:30:34] No data available for AAPL after fallback.
+[2025-10-19 00:30:34] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:30:34] No data available for MSFT after fallback.
+[2025-10-19 00:30:35] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:30:35] No data available for TSLA after fallback.
+[2025-10-19 00:31:41] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:31:43] No data available for AAPL after fallback.
+[2025-10-19 00:31:44] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:31:48] No data available for MSFT after fallback.
+[2025-10-19 00:31:51] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:31:52] No data available for TSLA after fallback.
+[2025-10-19 00:32:57] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:33:07] No data available for AAPL after fallback.
+[2025-10-19 00:33:16] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:33:23] No data available for MSFT after fallback.
+[2025-10-19 00:33:24] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:33:26] No data available for TSLA after fallback.
+[2025-10-19 00:34:26] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:34:26] No data available for AAPL after fallback.
+[2025-10-19 00:34:26] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:34:26] No data available for MSFT after fallback.
+[2025-10-19 00:34:26] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:34:27] No data available for TSLA after fallback.
+[2025-10-19 00:35:29] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:35:30] No data available for AAPL after fallback.
+[2025-10-19 00:35:31] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:35:32] No data available for MSFT after fallback.
+[2025-10-19 00:35:33] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:35:34] No data available for TSLA after fallback.
+[2025-10-19 00:36:40] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:36:40] No data available for AAPL after fallback.
+[2025-10-19 00:36:41] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:36:41] No data available for MSFT after fallback.
+[2025-10-19 00:36:41] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:36:41] No data available for TSLA after fallback.
+[2025-10-19 00:37:43] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:37:45] No data available for AAPL after fallback.
+[2025-10-19 00:37:45] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:37:45] No data available for MSFT after fallback.
+[2025-10-19 00:37:45] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:37:45] No data available for TSLA after fallback.
+[2025-10-19 00:38:50] No intraday data for AAPL. Trying daily bars...
+[2025-10-19 00:38:53] No data available for AAPL after fallback.
+[2025-10-19 00:38:58] No intraday data for MSFT. Trying daily bars...
+[2025-10-19 00:39:00] No data available for MSFT after fallback.
+[2025-10-19 00:39:02] No intraday data for TSLA. Trying daily bars...
+[2025-10-19 00:39:03] No data available for TSLA after fallback.
+[2025-10-24 16:23:01] ✅ Bot started successfully
+[2025-10-24 16:23:01] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-24 16:23:01] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:23:01] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:23:02] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:23:05] ✅ Bot started successfully
+[2025-10-24 16:23:05] Starting trading bot (LIVE_MODE=False, BASE_URL=https://paper-api.alpaca.markets)
+[2025-10-24 16:23:05] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:23:05] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:23:05] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:24:06] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:24:06] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:24:06] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:25:06] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:25:06] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:25:06] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:26:06] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:26:06] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:26:06] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:27:06] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:27:07] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:27:07] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:28:07] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:28:07] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:28:07] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:29:07] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:29:07] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:29:07] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:30:07] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:30:07] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:30:07] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:31:08] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:31:08] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:31:08] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:32:08] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:32:08] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:32:08] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:33:08] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:33:08] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:33:08] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:34:08] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:34:09] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:34:09] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:35:09] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:35:09] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:35:09] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:36:09] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:36:09] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:36:09] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:37:09] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:37:10] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:37:10] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:38:10] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:38:10] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:38:10] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:39:10] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:39:10] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:39:10] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:40:10] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:40:10] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:40:11] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:41:11] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:41:11] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:41:11] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:42:11] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:42:11] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:42:11] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:43:11] AAPL: ShortSMA=259.41, LongSMA=259.40, RSI=51.91
+[2025-10-24 16:43:11] MSFT: ShortSMA=522.49, LongSMA=522.14, RSI=65.79
+[2025-10-24 16:43:11] TSLA: ShortSMA=446.28, LongSMA=446.43, RSI=43.56
+[2025-10-24 16:43:11] Error processing TSLA: unauthorized.
+[2025-10-24 16:44:11] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-24 16:44:12] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-24 16:44:12] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-24 16:45:12] Error processing AAPL: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/AAPL/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-24 16:45:12] Error processing MSFT: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/MSFT/bars?timeframe=1Min&adjustment=raw&limit=29
+[2025-10-24 16:45:12] Error processing TSLA: 401 Client Error: Unauthorized for url: https://data.alpaca.markets/v2/stocks/TSLA/bars?timeframe=1Min&adjustment=raw&limit=29

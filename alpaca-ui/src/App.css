@@ -1,0 +1,77 @@
+/* General styling */
+body {
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* Title */
+h1 {
+  text-align: center;
+  font-size: 500px;
+  color: white;
+}
+
+/* Section headers */
+h2 {
+  text-align: center;
+  font-size: 60px;
+  color: white;
+}
+
+/* Paragraphs */
+p {
+  text-align: center;
+}
+
+/* Buttons container (NEW) */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Buttons */
+button {
+  width: 160px;
+  height: 60px;
+  font-size: 24px;
+  border: 2px solid white;
+  background-color: grey;
+  color: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: white;
+  color: black;
+}
+
+/* App structure */
+.App {
+  text-align: center;
+}
+
+/* Glowing pulse for active bot */
+.pulse-glow {
+  animation: pulse 1.5s infinite;
+  text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(0, 255, 100, 1);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
+  }
+}
