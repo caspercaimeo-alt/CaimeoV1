@@ -258,7 +258,7 @@ setDiscovered(top16);
     },
     authHeader: {
       backgroundColor: "#462323",
-      color: "#ffffffff",
+      color: "#837777ff",
       border: "5px solid #FCFBF4",
       borderRadius: "10px",
       width: "50%",
@@ -314,7 +314,7 @@ setDiscovered(top16);
       margin: "0 auto 20px",
       textAlign: "center",
       padding: "10px 0",
-      color: "#ffffffff",
+      color: "#837777ff",
       fontWeight: "bold",
       fontSize: "26px",
     },
