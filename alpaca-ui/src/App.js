@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-const SERVER = "https://caimeov1.onrender.com";
-
+const SERVER = process.env.REACT_APP_SERVER_URL;
+;
 function App() {
   const [logs, setLogs] = useState("");
   const [status, setStatus] = useState("Stopped");
   const [discovered, setDiscovered] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
-  const [account, setAccount] = useState({ cash: 0, invested: 0 });
+  const [orders, setOrders] = useState([]);
+  const [trades, setTrades] = useState([]);
+  const [account, setAccount] = useState({ cash: null, invested: null, buying_power: null, equity: null });
   const [apiKey, setApiKey] = useState("");
   const [apiSecret, setApiSecret] = useState("");
   const [msg, setMsg] = useState("");
@@ -22,6 +24,8 @@ function App() {
     eta: "N/A",
     status: "Idle",
   });
+  const [navOpen, setNavOpen] = useState(false);
+  const logsBoxRef = useRef(null);
 
   async function fetchProgress() {
     try {
@@ -93,6 +97,8 @@ setDiscovered(top16);
       if (data.valid) {
         setAuthenticated(true);
         setMsg("✅ Keys validated successfully");
+        fetchPortfolio();
+        fetchAccount();
       } else {
         setAuthenticated(false);
         setMsg("❌ Invalid API credentials");
@@ -142,9 +148,10 @@ setDiscovered(top16);
     try {
       const res = await fetch(`${SERVER}/account`);
       const data = await res.json();
-      if (data.cash !== undefined) setAccount(data);
+      if (data && data.cash !== undefined) setAccount(data);
+      else setAccount({ cash: null, invested: null, buying_power: null, equity: null });
     } catch {
-      setAccount({ cash: 12500.42, invested: 8700.33 });
+      setAccount({ cash: null, invested: null, buying_power: null, equity: null });
     }
   }
 
@@ -157,6 +164,30 @@ setDiscovered(top16);
       else setPortfolio([]);
     } catch {
       setPortfolio([]);
+    }
+  }
+
+  // ---- Fetch Open Orders ----
+  async function fetchOrders() {
+    try {
+      const res = await fetch(`${SERVER}/orders`);
+      const data = await res.json();
+      if (Array.isArray(data.orders)) setOrders(data.orders);
+      else setOrders([]);
+    } catch {
+      setOrders([]);
+    }
+  }
+
+  // ---- Fetch Trade History ----
+  async function fetchTrades() {
+    try {
+      const res = await fetch(`${SERVER}/trade_history`);
+      const data = await res.json();
+      if (Array.isArray(data.trades)) setTrades(data.trades);
+      else setTrades([]);
+    } catch {
+      setTrades([]);
     }
   }
 
@@ -179,10 +210,16 @@ setDiscovered(top16);
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-scroll live feed to bottom when logs update
+  useEffect(() => {
+    if (logsBoxRef.current) {
+      logsBoxRef.current.scrollTop = logsBoxRef.current.scrollHeight;
+    }
+  }, [logs]);
+
   // ---- Initial Data ----
   useEffect(() => {
     fetchDiscovered();
-    fetchAccount();
     fetchPortfolio();
     fetchStatus();
     fetchProgress(); // start polling discovery progress
@@ -195,17 +232,65 @@ setDiscovered(top16);
     return () => clearInterval(statusInterval);
   }, []);
 
+  // Poll portfolio when authenticated
+  useEffect(() => {
+    if (!authenticated) return;
+    fetchPortfolio();
+    fetchOrders();
+    fetchTrades();
+    fetchAccount();
+    const id = setInterval(fetchPortfolio, 10000);
+    const id2 = setInterval(fetchOrders, 12000);
+    const id4 = setInterval(fetchTrades, 25000);
+    const id3 = setInterval(fetchAccount, 20000);
+    return () => {
+      clearInterval(id);
+      clearInterval(id2);
+      clearInterval(id3);
+      clearInterval(id4);
+    };
+  }, [authenticated]);
+
 
   const calcGainLoss = (p) => ((p.currentPrice - p.avgPrice) * p.qty).toFixed(2);
+  const calcTradePnl = (t) => {
+    if (
+      t.soldPrice === null ||
+      t.soldPrice === undefined ||
+      t.avgPrice === null ||
+      t.avgPrice === undefined ||
+      t.qty === null ||
+      t.qty === undefined
+    ) {
+      return null;
+    }
+    const sold = Number(t.soldPrice);
+    const avg = Number(t.avgPrice);
+    const qty = Number(t.qty);
+    if ([sold, avg, qty].some((v) => Number.isNaN(v))) return null;
+    return ((sold - avg) * qty).toFixed(2);
+  };
   const fmt1 = (v, suffix = "") => {
     if (v === null || v === undefined || Number.isNaN(Number(v)))
       return "N/A" + suffix;
     return Number(v).toFixed(1) + suffix;
   };
+  const fmtMoney = (v) =>
+    v === null || v === undefined || Number.isNaN(Number(v))
+      ? "N/A"
+      : `$${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const numOr = (v, fallback) =>
     v === null || v === undefined || Number.isNaN(Number(v))
       ? fallback
       : Number(v);
+
+  const navItems = [
+    { label: "API Auth", href: "#auth-section" },
+    { label: "Bot Status", href: "#status-section" },
+    { label: "Live Feed", href: "#live-feed-section" },
+    { label: "Discovery", href: "#discovery-section" },
+    { label: "Portfolio", href: "#portfolio-section" },
+  ];
 
   // ---- Confidence Grade Mapping ----
   const getConfidenceGrade = (conf) => {
@@ -220,7 +305,7 @@ setDiscovered(top16);
   const styles = {
     page: {
       backgroundColor: "#483c3bd5",
-      backgroundImage: "url('/circuit_bg.png')",
+      backgroundImage: "url('/circuit_bg4.png')",
       backgroundRepeat: "repeat",
       backgroundSize: "contain",
       color: "white",
@@ -228,37 +313,89 @@ setDiscovered(top16);
       minHeight: "100vh",
       overflowX: "hidden",
       overflowY: "auto",
-      paddingTop: "60px",
+      paddingTop: "0px",
       margin: 0,
       paddingBottom: "100px",
     },
     headerBox: {
       backgroundColor: "#462323",
-      border: "12px solid white",
-      borderRadius: "20px",
-      width: "60%",
-      margin: "0 auto 60px",
-      textAlign: "center",
-      padding: "20px 0",
+      border: "0",
+      borderBottom: "5px solid #FCFBF4",
+      borderRadius: "0px",
+      width: "100%",
+      height: "50px",
+      margin: "0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "2px 10px",
+      position: "relative",
+      boxShadow: "0 6px 12px rgba(0,0,0,0.25)",
+      gap: "2px",
     },
     title: {
-      fontSize: "12vw",
-      fontWeight: "800",
-      color: "white",
+      fontSize: "32px",
+      fontWeight: "900",
+      letterSpacing: "1px",
+      color: "#FCFBF4",
       textAlign: "center",
       margin: 0,
     },
+    navLinksInline: {
+      display: "none",
+      flexDirection: "column",
+      alignItems: "stretch",
+      gap: "0",
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      top: "100%",
+      width: "160px",
+      backgroundColor: "#FCFBF4",
+      border: "2px solid #462323",
+      borderRadius: "0 0 10px 10px",
+      overflow: "hidden",
+      boxShadow: "0 8px 16px rgba(0,0,0,0.25)",
+      pointerEvents: "auto",
+    },
+    navLinkInline: {
+      color: "#462323",
+      textDecoration: "none",
+      fontSize: "12px",
+      fontWeight: "700",
+      padding: "8px 10px",
+      borderBottom: "1px solid #462323",
+      backgroundColor: "#FCFBF4",
+    },
+    navBar: {
+      position: "static",
+      width: "100%",
+      zIndex: 10,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "transparent",
+      padding: "0",
+      border: "0",
+      borderBottom: "0",
+      boxShadow: "none",
+      margin: "0",
+    },
+    navMenuWrapper: {
+      display: "none",
+    },
     authWrapper: {
-      backgroundColor: "#837777ff",
-      border: "8px solid #FCFBF4",
-      borderRadius: "10px",
+      backgroundColor: "transparent",
+      border: "none",
+      borderRadius: "0px",
       width: "85%",
       margin: "0 auto 40px",
       padding: "20px 0 40px 0",
     },
     authHeader: {
       backgroundColor: "#462323",
-      color: "#837777ff",
+      color: "#FCFBF4",
       border: "5px solid #FCFBF4",
       borderRadius: "10px",
       width: "50%",
@@ -274,9 +411,12 @@ setDiscovered(top16);
       width: "65%",
       margin: "30px auto",
       textAlign: "center",
-      padding: "50px 50px 30px",
+      padding: "0",
       borderRadius: "8px",
       color: "black",
+    },
+    authContent: {
+      padding: "40px 50px 30px",
     },
     authInput: {
       width: "80%",
@@ -287,8 +427,9 @@ setDiscovered(top16);
       fontSize: "16px",
     },
     authButton: {
-      padding: "10px 24px",
+      padding: "10px 22px",
       marginTop: "10px",
+      marginRight: "32px",
       border: "3px solid #462323",
       borderRadius: "8px",
       backgroundColor: "#FCFBF4",
@@ -298,13 +439,16 @@ setDiscovered(top16);
       cursor: "pointer",
     },
     statusBox: {
-      backgroundColor: "#2d2d2dff",
-      border: "8px solid #FCFBF4",
-      borderRadius: "10px",
-      padding: "25px 0",
-      width: "60%",
+      backgroundColor: "#FCFBF4",
+      border: "4px solid #462323",
+      borderRadius: "12px",
+      padding: "0px 30px 16px",
+      width: "28%",
       margin: "0 auto 30px",
       textAlign: "center",
+      color: "#462323",
+      boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
+      minHeight: "220px",
     },
     sectionHeaderDiv: {
       backgroundColor: "#462323",
@@ -314,7 +458,7 @@ setDiscovered(top16);
       margin: "0 auto 20px",
       textAlign: "center",
       padding: "10px 0",
-      color: "#837777ff",
+      color: "#FCFBF4",
       fontWeight: "bold",
       fontSize: "26px",
     },
@@ -345,12 +489,20 @@ setDiscovered(top16);
       textAlign: "center",
     },
     discoveryWrapper: {
-      backgroundColor: "#837777ff",
-      border: "8px solid #FCFBF4",
-      borderRadius: "10px",
+      backgroundColor: "transparent",
+      border: "none",
+      borderRadius: "0px",
       width: "85%",
       margin: "0 auto 40px",
-      padding: "30px 0",
+      padding: "60px 0 30px",
+    },
+    portfolioWrapper: {
+      backgroundColor: "transparent",
+      border: "0",
+      borderRadius: "0px",
+      width: "85%",
+      margin: "0 auto 40px",
+      padding: "60px 0 30px",
     },
     discoveryGrid: {
       display: "grid",
@@ -368,7 +520,7 @@ setDiscovered(top16);
       width: "200px",
       textAlign: "center",
       textDecoration: "none",
-      padding: "15px 10px",
+      padding: "12px 10px",
       margin: "10px",
     },
     stockTickerBox: {
@@ -404,7 +556,7 @@ setDiscovered(top16);
     },
     confidenceBadge: (color) => ({
       display: "inline-block",
-      marginTop: "6px",
+      marginTop: "12px",
       padding: "4px 8px",
       borderRadius: "8px",
       fontSize: "13px",
@@ -413,157 +565,262 @@ setDiscovered(top16);
       color: "#FCFBF4",
       border: "1px solid #462323",
     }),
+    strategyTag: (_color) => ({
+      display: "block",
+      marginTop: "10px",
+      padding: "3px 6px",
+      borderRadius: "6px",
+      fontSize: "13px",
+      fontWeight: "800",
+      backgroundColor: "#FCFBF4",
+      color: "#462323",
+      border: "1px solid #FCFBF4",
+    }),
     liveFeedBox: {
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
-      borderRadius: "10px",
-      width: "80%",
+      borderRadius: "0 0 10px 10px",
+      borderTop: "0",
+      width: "100%",
       margin: "0 auto",
       color: "#462323",
-      padding: "20px",
-      maxHeight: "300px",
+      padding: "16px 18px",
+      maxHeight: "250px",
       overflowY: "auto",
       fontFamily: "monospace",
+      lineHeight: 1.4,
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+    },
+    tradeButton: {
+      padding: "10px 24px",
+      marginTop: "10px",
+      border: "3px solid #462323",
+      borderRadius: "8px",
+      backgroundColor: "#FCFBF4",
+      color: "#462323",
+      fontWeight: "700",
+      fontSize: "16px",
+      cursor: "pointer",
+      marginRight: "8px",
     },
   };
 
   return (
     <div style={styles.page}>
-      {/* Header */}
-      <div style={styles.headerBox}>
-        <h1 style={styles.title}>CAIMEO</h1>
-      </div>
-
-      {/* Auth Section */}
-      <div style={styles.authWrapper}>
-        <div style={styles.authHeader}>
-          <h2>API Authentication</h2>
-        </div>
-        <div style={styles.authBox}>
-          <form onSubmit={submitKeys}>
-            <input
-              style={styles.authInput}
-              type="text"
-              placeholder="API Key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-            <br />
-            <input
-              style={styles.authInput}
-              type="password"
-              placeholder="API Secret"
-              value={apiSecret}
-              onChange={(e) => setApiSecret(e.target.value)}
-            />
-            <br />
-            <button style={styles.authButton} type="submit">
-              Submit
-            </button>
-          </form>
-          <p>{msg}</p>
-        </div>
-      </div>
-
-      {/* Status Section */}
-      <div style={styles.statusBox}>
-        <h2>
-          Status:{" "}
-          <span style={{ color: status === "Running" ? "green" : "red" }}>
-            {status}
-          </span>
-        </h2>
-        <div>
-          <button
+      {/* Nav */}
+      <div style={styles.navBar}>
+        <div
+          style={{
+            ...styles.headerBox,
+            margin: "0 auto",
+          }}
+          onMouseEnter={() => setNavOpen(true)}
+          onMouseLeave={() => setNavOpen(false)}
+        >
+          <h1 style={styles.title}>CAIMEO</h1>
+          <div
             style={{
-              ...styles.authButton,
-              opacity: authenticated ? 1 : 0.5,
-              cursor: authenticated ? "pointer" : "not-allowed",
+              ...styles.navLinksInline,
+              display: navOpen ? "flex" : "none",
             }}
-            disabled={!authenticated}
-            onClick={() => handleControl("start")}
+            onMouseEnter={() => setNavOpen(true)}
+            onMouseLeave={() => setNavOpen(false)}
           >
-            Start
-          </button>
-          <button
-            style={styles.authButton}
-            onClick={() => handleControl("stop")}
-          >
-            Stop
-          </button>
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href} style={styles.navLinkInline}>
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
-        <p style={{ fontSize: "22px" }}>
-          Authenticated:{" "}
-          <span style={{ color: authenticated ? "green" : "red" }}>
-            {authenticated ? "✅" : "❌"}
-          </span>
-        </p>
       </div>
 
-      {/* Portfolio */}
-      <div style={styles.discoveryWrapper}>
-        <div style={styles.sectionHeaderDiv}>
-          <h2>Portfolio</h2>
+      {/* Auth Section + Status */}
+      <div id="auth-section" style={styles.authWrapper}>
+        <div style={styles.authBox}>
+          <div
+            style={{
+              ...styles.authHeader,
+              width: "100%",
+              margin: "0 auto",
+              boxSizing: "border-box",
+              padding: "10px 16px",
+              borderRadius: "8px 8px 0 0",
+              backgroundColor: "#FCFBF4",
+              color: "#462323",
+            }}
+          >
+            <h2>API Authentication</h2>
+          </div>
+          <div
+            style={{
+              backgroundColor: "#FCFBF4",
+              borderRadius: "0 0 8px 8px",
+            }}
+          >
+            <div style={{ ...styles.authContent, paddingTop: "0px" }}>
+              <form onSubmit={submitKeys}>
+                <input
+                  style={styles.authInput}
+                  type="text"
+                  placeholder="API Key"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
+                <br />
+                <input
+                  style={styles.authInput}
+                  type="password"
+                  placeholder="API Secret"
+                  value={apiSecret}
+                  onChange={(e) => setApiSecret(e.target.value)}
+                />
+                <br />
+                <button style={styles.authButton} type="submit">
+                  Submit
+                </button>
+              </form>
+              <p>{msg}</p>
+            </div>
+          </div>
         </div>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Symbol</th>
-              <th style={styles.th}>Qty</th>
-              <th style={styles.th}>Avg Price</th>
-              <th style={styles.th}>Current Price</th>
-              <th style={styles.th}>Gain/Loss</th>
-            </tr>
-          </thead>
-          <tbody>
-            {portfolio.length > 0 ? (
-              portfolio.map((p, i) => {
-                const gainLoss = calcGainLoss(p);
-                const isGain = gainLoss >= 0;
-                return (
-                  <tr key={i}>
-                    <td style={styles.td}>{p.symbol}</td>
-                    <td style={styles.td}>{p.qty}</td>
-                    <td style={styles.td}>${Number(p.avgPrice).toFixed(2)}</td>
-                    <td style={styles.td}>${Number(p.currentPrice).toFixed(2)}</td>
-                    <td
-                      style={{
-                        ...styles.gainLoss,
-                        color: isGain ? "green" : "red",
-                      }}
-                    >
-                      ${gainLoss}
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td style={styles.td}>CAIMEO</td>
-                <td style={styles.td}>3</td>
-                <td style={styles.td}>$6.00</td>
-                <td style={styles.td}>$9.00</td>
-                <td style={{ ...styles.gainLoss, color: "green" }}>$9.00</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+
+        {/* Status + Live Feed row */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            gap: "140px",
+            padding: "0 24px",
+            marginTop: "85px",
+            marginBottom: "40px",
+          }}
+        >
+          <div id="status-section" style={{ ...styles.statusBox, width: "28%", margin: "0" }}>
+            <div
+              style={{
+                backgroundColor: "#462323",
+                color: "#FCFBF4",
+                width: "calc(100% + 34px)",
+                marginLeft: "-30px",
+                marginRight: "0px",
+                padding: "10px 14px",
+                borderRadius: "0px",
+                fontWeight: "900",
+                marginBottom: "24px",
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: "38px" }}>Bot Status</h3>
+            </div>
+            <div
+              style={{
+                display: "inline-block",
+                padding: "13px 26px",
+                borderRadius: "999px",
+                backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
+                color: "#FCFBF4",
+                fontWeight: "900",
+                fontSize: "22px",
+                marginTop: "30px",
+                marginBottom: "26px",
+                border: "2px solid #FCFBF4",
+              }}
+            >
+              {status}
+            </div>
+            <div>
+              <button
+                style={{
+                  ...styles.authButton,
+                  opacity: authenticated ? 1 : 0.5,
+                  cursor: authenticated ? "pointer" : "not-allowed",
+                }}
+                disabled={!authenticated}
+                onClick={() => handleControl("start")}
+              >
+                Start
+              </button>
+              <button
+                style={{ ...styles.authButton, marginRight: 0 }}
+                onClick={() => handleControl("stop")}
+              >
+                Stop
+              </button>
+            </div>
+            <p style={{ fontSize: "18px", marginTop: "24px", marginBottom: "34px" }}>
+              Authenticated:{" "}
+              <span style={{ color: authenticated ? "green" : "red" }}>
+                {authenticated ? "✅" : "❌"}
+              </span>
+            </p>
+          </div>
+
+          <div
+            style={{
+              width: "32%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+            id="live-feed-section"
+          >
+            <div
+              style={{
+                ...styles.sectionHeaderDiv,
+                width: "100%",
+                margin: "0",
+                padding: "12px 0",
+                marginBottom: "0px",
+                borderBottom: "0",
+                borderRadius: "10px 10px 0 0",
+                borderColor: "#462323",
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: "38px", lineHeight: "1.1" }}>Live Feed</h2>
+            </div>
+            <div
+              style={{
+                ...styles.liveFeedBox,
+                width: "90%",
+                margin: "0",
+              }}
+              ref={logsBoxRef}
+            >
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{logs}</pre>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Discovered Stocks */}
-      <div style={styles.discoveryWrapper}>
+      <div style={styles.discoveryWrapper} id="discovery-section">
 
-        <div style={styles.sectionHeaderDiv}>
-          <h2>Discovery</h2>
+        <div style={{ ...styles.sectionHeaderDiv, width: "90%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}>
+          <div
+            style={{
+              backgroundColor: "#462323",
+                color: "#FCFBF4",
+                padding: "12px 0",
+                fontSize: "58px",
+                fontWeight: "800",
+                border: "4px solid #462323",
+                borderRadius: "10px 10px 0 0",
+              }}
+            >
+            Discovery
+          </div>
         
 {/* ✅ Discovery Progress Bar */}
 <div
   style={{
     backgroundColor: "#FCFBF4",
-    border: "5px solid #462323",
-    borderRadius: "10px",
-    width: "60%",
-    margin: "10px auto",
+    border: "4px solid #462323",
+    borderRadius: "0 0 10px 10px",
+    width: "99%",
+    margin: "0 auto 10px",
     padding: "10px 0",
     textAlign: "center",
     color: "#462323",
@@ -571,14 +828,14 @@ setDiscovered(top16);
     fontSize: "18px",
   }}
 >
-  <p>
+  <p style={{ margin: "20px 0 0 0" }}>
     <strong>{progress.status}</strong> —{" "}
     {progress.percent.toFixed(1)}% ({progress.eta} remaining)
   </p>
   <div
     style={{
       backgroundColor: "#837777ff",
-      width: "80%",
+      width: "93%",
       height: "25px",
       borderRadius: "8px",
       border: "2px solid #462323",
@@ -628,6 +885,13 @@ const growth =
               const colorMap = { A: "#3cb043", B: "#7dc242", C: "#f0c93d", D: "#f28f3b", F: "#d94f4f" };
               const grade = confLetter;
               const color = colorMap[confLetter] || "#d94f4f";
+              const inferredStrategy = () => {
+                if (item.strategy) return item.strategy;
+                if (item.rebound !== undefined || item.drop_5d !== undefined) return "5 Day Strategy";
+                if (item.gain_3d !== undefined) return "3 Day Strategy";
+                return null;
+              };
+              const strategyLabel = inferredStrategy() || "N/A";
 
 
               
@@ -749,6 +1013,9 @@ const growth =
                     <div style={styles.confidenceBadge(color)}>
                       Confidence: {grade}
                     </div>
+                    <div style={styles.strategyTag(color)}>
+                      {strategyLabel}
+                    </div>
                   </div>
                 </a>
               );
@@ -793,21 +1060,197 @@ const growth =
                 <div style={styles.confidenceBadge("#3cb043")}>
                   Confidence: A
                 </div>
+                <div style={styles.strategyTag("#3cb043")}>
+                  3-Day Momentum
+                </div>
               </div>
             </a>
           )}
         </div>
       </div>
 
-      {/* Executed Trades / Live Feed */}
-      <div style={styles.discoveryWrapper}>
-        <div style={styles.sectionHeaderDiv}>
-          <h2>Live Feed</h2>
-        </div>
-        <div style={styles.liveFeedBox}>
-          <pre>{logs}</pre>
-        </div>
+      {/* Portfolio + Open Orders */}
+      <div style={{ ...styles.portfolioWrapper, paddingTop: "0px" }} id="portfolio-section">
+        <table style={{ ...styles.table, width: "100%", border: "0" }}>
+          <thead>
+            <tr>
+              <th style={{ ...styles.th, fontSize: "32px" }} colSpan={5}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                  <span style={{ fontSize: "54px" }}>Portfolio</span>
+                  <div
+                    style={{
+                      width: "100%",
+                      backgroundColor: "#462323",
+                      color: "#FCFBF4",
+                      border: "2px solid #462323",
+                      padding: "6px 8px",
+                      fontSize: "22px",
+                      fontWeight: "600",
+                      borderRadius: "0px",
+                    }}
+                  >
+                    {authenticated && account?.equity !== null
+                      ? fmtMoney(account.equity)
+                      : "Authenticate to view equity"}
+                  </div>
+                  <div>
+                    <button style={styles.tradeButton} onClick={() => handleControl("start")}>
+                      Start Live Trading
+                    </button>
+                    <button style={styles.tradeButton} onClick={() => handleControl("stop")}>
+                      Stop Live Trading
+                    </button>
+                  </div>
+                </div>
+              </th>
+            </tr>
+            <tr>
+              <th style={styles.th}>Symbol</th>
+              <th style={styles.th}>Qty</th>
+              <th style={styles.th}>Avg Price</th>
+              <th style={styles.th}>Current Price</th>
+              <th style={styles.th}>Gain/Loss</th>
+            </tr>
+          </thead>
+          <tbody>
+            {portfolio.length > 0 ? (
+              portfolio.map((p, i) => {
+                const gainLoss = calcGainLoss(p);
+                const isGain = gainLoss >= 0;
+                return (
+                  <tr key={i}>
+                    <td style={styles.td}>{p.symbol}</td>
+                    <td style={styles.td}>{p.qty}</td>
+                    <td style={styles.td}>${Number(p.avgPrice).toFixed(2)}</td>
+                    <td style={styles.td}>${Number(p.currentPrice).toFixed(2)}</td>
+                    <td
+                      style={{
+                        ...styles.gainLoss,
+                        color: isGain ? "green" : "red",
+                      }}
+                    >
+                      ${gainLoss}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td style={styles.td}>CAIMEO</td>
+                <td style={styles.td}>3</td>
+                <td style={styles.td}>$6.00</td>
+                <td style={styles.td}>$9.00</td>
+                <td style={{ ...styles.gainLoss, color: "green" }}>$9.00</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
+          <thead>
+            <tr>
+              <th style={{ ...styles.th, fontSize: "32px" }} colSpan={6}>
+                Open Orders
+              </th>
+            </tr>
+            <tr>
+              <th style={styles.th}>Symbol</th>
+              <th style={styles.th}>Side</th>
+              <th style={styles.th}>Qty</th>
+              <th style={styles.th}>Type</th>
+              <th style={styles.th}>Limit/Stop</th>
+              <th style={styles.th}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.length > 0 ? (
+              orders.map((o, i) => (
+                <tr key={i}>
+                  <td style={styles.td}>{o.symbol}</td>
+                  <td style={styles.td}>{o.side}</td>
+                  <td style={styles.td}>{o.qty}</td>
+                  <td style={styles.td}>{o.type}</td>
+                  <td style={styles.td}>
+                    {o.limit_price ? `$${Number(o.limit_price).toFixed(2)}` : o.stop_price ? `$${Number(o.stop_price).toFixed(2)}` : "—"}
+                  </td>
+                  <td style={styles.td}>{o.status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td style={styles.td}>—</td>
+                <td style={styles.td}>—</td>
+                <td style={styles.td}>—</td>
+                <td style={styles.td}>—</td>
+                <td style={styles.td}>—</td>
+                <td style={styles.td}>No open orders</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
+          <thead>
+            <tr>
+              <th style={{ ...styles.th, fontSize: "32px" }} colSpan={5}>
+                Trade History
+              </th>
+            </tr>
+            <tr>
+              <th style={styles.th}>Symbol</th>
+              <th style={styles.th}>Qty</th>
+              <th style={styles.th}>Avg Price</th>
+              <th style={styles.th}>Sold Price</th>
+              <th style={styles.th}>Gain/Loss</th>
+            </tr>
+          </thead>
+          <tbody>
+            {authenticated ? (
+              trades.length > 0 ? (
+                trades.map((t, i) => {
+                  const gainLoss = calcTradePnl(t);
+                  const isGain = gainLoss !== null && gainLoss >= 0;
+                  return (
+                    <tr key={i}>
+                      <td style={styles.td}>{t.symbol}</td>
+                      <td style={styles.td}>{t.qty}</td>
+                      <td style={styles.td}>
+                        {t.avgPrice !== null && t.avgPrice !== undefined
+                          ? `$${Number(t.avgPrice).toFixed(2)}`
+                          : "—"}
+                      </td>
+                      <td style={styles.td}>
+                        {t.soldPrice !== null && t.soldPrice !== undefined
+                          ? `$${Number(t.soldPrice).toFixed(2)}`
+                          : "—"}
+                      </td>
+                      <td
+                        style={{
+                          ...styles.gainLoss,
+                          color: gainLoss === null ? "#462323" : isGain ? "green" : "red",
+                        }}
+                      >
+                        {gainLoss === null ? "—" : `$${gainLoss}`}
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td style={styles.td} colSpan={5}>
+                    No trades yet.
+                  </td>
+                </tr>
+              )
+            ) : (
+              <tr>
+                <td style={styles.td} colSpan={5}>
+                  Authenticate to view trade history.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
+
     </div>
   );
 }
