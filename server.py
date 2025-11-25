@@ -24,14 +24,19 @@ from pydantic import BaseModel
 import uvicorn
 
 import stock_discovery  # our discovery engine
+import auto_trader      # auto trading loop
 
 # ------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------
 DISCOVERY_FILE = os.getenv("DISCOVERY_OUTPUT", "discovered_full.json")
+BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 active_keys: Dict[str, str] = {}
 bot_running = False
 auto_discovery_thread = None
+trading_thread = None
+trading_stop_event = threading.Event()
+first_discovery_done = threading.Event()
 
 # shared progress state
 discovery_progress = {
@@ -117,7 +122,7 @@ async def auth_creds(payload: dict):
 @app.post("/start")
 async def start():
     """Start bot + discovery loop."""
-    global bot_running, auto_discovery_thread, discovery_progress
+    global bot_running, auto_discovery_thread, discovery_progress, trading_thread, trading_stop_event
 
     if bot_running:
         return {"status": "already running"}
@@ -126,13 +131,37 @@ async def start():
         return {"status": "error", "message": "No valid Alpaca credentials yet."}
 
     bot_running = True
+    first_discovery_done.clear()
     _log("🚀 Trading bot started (LIVE_MODE=False)")
 
     key = active_keys.get("apiKey")
     secret = active_keys.get("apiSecret")
 
+    def _start_trading_loop():
+        """Start trading thread if not already running."""
+        global trading_thread, trading_stop_event
+        if trading_thread is None or not trading_thread.is_alive():
+            trading_stop_event = threading.Event()
+            trading_thread = threading.Thread(
+                target=auto_trader.run,
+                args=(trading_stop_event, key, secret, BASE_URL),
+                daemon=True,
+            )
+            trading_thread.start()
+            _log("🤖 Auto-trading loop started.")
+        else:
+            _log("ℹ️ Auto-trading already running.")
+
     def discovery_loop():
         global discovery_progress, bot_running
+        first_cycle_marked = False
+
+        def mark_first_done():
+            nonlocal first_cycle_marked
+            if not first_cycle_marked:
+                first_cycle_marked = True
+                first_discovery_done.set()
+
         while bot_running:
             try:
                 discovery_progress = {
@@ -184,6 +213,7 @@ async def start():
                     time.sleep(1)
 
                 t.join(timeout=3)
+                mark_first_done()
                 if not bot_running:
                     discovery_progress["status"] = "Stopped"
                     _log("🟥 Discovery interrupted by user.")
@@ -200,25 +230,56 @@ async def start():
             except Exception as e:
                 discovery_progress["status"] = f"Error: {e}"
                 _log(f"⚠️ Discovery loop exception: {e}")
+                mark_first_done()
                 time.sleep(60)
 
     auto_discovery_thread = threading.Thread(target=discovery_loop, daemon=True)
     auto_discovery_thread.start()
+
+    # ---- Start auto-trading only after first discovery completes (or timeout) ----
+    def start_trading_when_ready():
+        waited = False
+        elapsed = 0
+        # Poll to allow early exit if bot is stopped
+        while elapsed < 900:  # 15 minutes max wait
+            if not bot_running:
+                _log("ℹ️ Bot stopped before initial discovery completed; trading not started.")
+                return
+            if first_discovery_done.is_set():
+                waited = True
+                break
+            time.sleep(1)
+            elapsed += 1
+
+        if waited:
+            _log("✅ Initial discovery finished; starting auto-trading.")
+        else:
+            _log("⚠️ Initial discovery did not finish within 15 minutes; starting auto-trading anyway.")
+        _start_trading_loop()
+
+    threading.Thread(target=start_trading_when_ready, daemon=True).start()
+
     return {"status": "started"}
 
 @app.post("/stop")
 async def stop():
-    global bot_running, discovery_progress
+    global bot_running, discovery_progress, trading_stop_event
     if not bot_running:
         return {"status": "stopped"}
     bot_running = False
     discovery_progress["status"] = "Stopped"
     _log("🟥 Bot stopped.")
+
+    if trading_stop_event:
+        trading_stop_event.set()
+        _log("🛑 Auto-trading stop requested.")
+
     return {"status": "stopped"}
 
 @app.get("/status")
 async def status():
-    return {"status": "Running" if bot_running else "Stopped"}
+    trading = "Running" if (trading_thread and trading_thread.is_alive()) else "Stopped"
+    return {"status": "Running" if bot_running else "Stopped", "auto_trading": trading}
 
 @app.get("/progress")
 async def progress():
@@ -235,12 +296,179 @@ async def progress():
 
 @app.get("/positions")
 async def positions():
-    """Stub portfolio endpoint for frontend compatibility."""
-    return {"positions": []}
+    """Return live positions from Alpaca if credentials are present."""
+    if not active_keys:
+        _log("ℹ️ Positions requested but no active credentials set.")
+        return {"positions": []}
+    base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+    key = active_keys.get("apiKey")
+    secret = active_keys.get("apiSecret")
+    try:
+        r = requests.get(
+            f"{base}/v2/positions",
+            headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
+            timeout=8,
+        )
+        r.raise_for_status()
+        data = r.json()
+        cleaned = []
+        for p in data:
+            try:
+                cleaned.append(
+                    {
+                        "symbol": p.get("symbol"),
+                        "qty": float(p.get("qty", 0)),
+                        "avgPrice": float(p.get("avg_entry_price", 0)),
+                        "currentPrice": float(p.get("current_price", 0)),
+                    }
+                )
+            except Exception:
+                continue
+        _log(f"✅ Positions fetched: {len(cleaned)}")
+        return {"positions": cleaned}
+    except Exception as e:
+        _log(f"⚠️ Positions fetch failed: {e}")
+        return {"positions": []}
+
+
+@app.get("/orders")
+async def orders():
+    """Return open orders from Alpaca."""
+    if not active_keys:
+        _log("ℹ️ Orders requested but no active credentials set.")
+        return {"orders": []}
+    base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+    key = active_keys.get("apiKey")
+    secret = active_keys.get("apiSecret")
+    try:
+        r = requests.get(
+            f"{base}/v2/orders",
+            headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
+            params={"status": "open", "nested": "true"},
+            timeout=8,
+        )
+        r.raise_for_status()
+        data = r.json()
+        cleaned = []
+        for o in data:
+            try:
+                cleaned.append(
+                    {
+                        "symbol": o.get("symbol"),
+                        "side": o.get("side"),
+                        "qty": float(o.get("qty", 0)),
+                        "type": o.get("type"),
+                        "limit_price": o.get("limit_price"),
+                        "stop_price": o.get("stop_price"),
+                        "status": o.get("status"),
+                    }
+                )
+            except Exception:
+                continue
+        _log(f"✅ Open orders fetched: {len(cleaned)}")
+        return {"orders": cleaned}
+    except Exception as e:
+        _log(f"⚠️ Orders fetch failed: {e}")
+        return {"orders": []}
+
+@app.get("/trade_history")
+async def trade_history():
+    """Return recent filled/closed orders from Alpaca."""
+    if not active_keys:
+        _log("ℹ️ Trade history requested but no active credentials set.")
+        return {"trades": []}
+
+    base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+    key = active_keys.get("apiKey")
+    secret = active_keys.get("apiSecret")
+    try:
+        r = requests.get(
+            f"{base}/v2/orders",
+            headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
+            params={"status": "closed", "direction": "desc", "limit": 100},
+            timeout=8,
+        )
+        r.raise_for_status()
+        data = r.json()
+
+        # Pair filled buys with subsequent filled sells per symbol to build closed trades.
+        # We only include rows where both entry and exit prices are present.
+        orders = [
+            o
+            for o in data
+            if o.get("status") == "filled" and o.get("filled_avg_price") and o.get("filled_qty")
+        ]
+        # Oldest-first so we can match buys to later sells.
+        orders.sort(key=lambda o: o.get("filled_at") or o.get("submitted_at") or "")
+
+        open_buys = {}
+        paired_trades = []
+        for o in orders:
+            sym = o.get("symbol")
+            side = o.get("side")
+            try:
+                qty = float(o.get("filled_qty"))
+                price = float(o.get("filled_avg_price"))
+            except Exception:
+                continue
+
+            if side == "buy":
+                open_buys[sym] = {"qty": qty, "price": price, "filled_at": o.get("filled_at")}
+            elif side == "sell" and sym in open_buys:
+                entry = open_buys.pop(sym)
+                paired_qty = min(entry["qty"], qty)
+                paired_trades.append(
+                    {
+                        "symbol": sym,
+                        "qty": paired_qty,
+                        "avgPrice": entry["price"],
+                        "soldPrice": price,
+                        "side": "sell",
+                        "filled_at": o.get("filled_at"),
+                        "status": "closed",
+                    }
+                )
+
+        _log(f"✅ Trade history fetched: {len(paired_trades)} closed trades")
+        return {"trades": paired_trades}
+    except Exception as e:
+        _log(f"⚠️ Trade history fetch failed: {e}")
+        return {"trades": []}
 
 @app.get("/account")
 async def account():
-    return {"cash": 12500.42, "invested": 8700.33}
+    """Return live account balances from Alpaca; fallback to None values."""
+    if not active_keys:
+        _log("ℹ️ Account requested but no active credentials set.")
+        return {"cash": None, "invested": None, "portfolio_value": None, "buying_power": None, "equity": None}
+
+    base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+    key = active_keys.get("apiKey")
+    secret = active_keys.get("apiSecret")
+    try:
+        r = requests.get(
+            f"{base}/v2/account",
+            headers={"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret},
+            timeout=8,
+        )
+        r.raise_for_status()
+        data = r.json()
+        cash = float(data.get("cash", 0))
+        portfolio_value = float(data.get("portfolio_value", cash))
+        invested = portfolio_value - cash
+        buying_power = float(data.get("buying_power", 0))
+        equity = float(data.get("equity", portfolio_value))
+        _log("✅ Account balances fetched.")
+        return {
+            "cash": cash,
+            "invested": invested,
+            "portfolio_value": portfolio_value,
+            "buying_power": buying_power,
+            "equity": equity,
+        }
+    except Exception as e:
+        _log(f"⚠️ Account fetch failed: {e}")
+        return {"cash": None, "invested": None, "portfolio_value": None, "buying_power": None, "equity": None}
 
 from fastapi.encoders import jsonable_encoder
 import math
