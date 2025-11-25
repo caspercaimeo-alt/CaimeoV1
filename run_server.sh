@@ -8,6 +8,17 @@ export UNIVERSE_LIMIT=10000
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
+# Load environment variables (including ENABLE_AUTO_TRADING) if .env is present
+if [ -f ".env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ".env"
+  set +a
+  echo "✅ Loaded environment from .env"
+else
+  echo "⚠️ .env not found — using existing environment only."
+fi
+
 echo "🧹 Checking for existing Uvicorn processes..."
 if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
   echo "⚠️  Found existing Uvicorn process — stopping it..."
@@ -16,6 +27,13 @@ if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
 fi
 
 echo "🚀 Starting FastAPI server (port 8000)..."
+# If something is already bound to 8000, stop it
+existing8000=$(lsof -t -i :8000 2>/dev/null)
+if [ -n "$existing8000" ]; then
+  echo "⚠️  Port 8000 in use by PID(s): $existing8000 — killing..."
+  echo "$existing8000" | xargs kill -9 2>/dev/null
+  sleep 1
+fi
 uvicorn server:app --reload --port 8000 &
 SERVER_PID=$!
 
@@ -89,4 +107,15 @@ echo "------------------------------------------------------"
 echo "💡 Press Ctrl+C to stop everything (server + bot + frontend)"
 echo "------------------------------------------------------"
 
-trap "echo '\n🛑 Stopping services...'; kill $SERVER_PID $_
+cleanup() {
+  echo "\n🛑 Stopping services..."
+  if kill -0 "$SERVER_PID" >/dev/null 2>&1; then
+    kill "$SERVER_PID" 2>/dev/null
+  fi
+  if kill -0 "$FRONTEND_PID" >/dev/null 2>&1; then
+    kill "$FRONTEND_PID" 2>/dev/null
+  fi
+}
+
+trap cleanup INT TERM
+wait
