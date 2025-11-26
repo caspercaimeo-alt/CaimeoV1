@@ -3,6 +3,11 @@
 # run_server.sh — One-command launcher for Alpaca Bot
 # =====================================================
 
+# Raise file descriptor limit to avoid "Too many open files"
+if command -v ulimit >/dev/null 2>&1; then
+  ulimit -n 65536 2>/dev/null || true
+fi
+
 export UNIVERSE_LIMIT=10000
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
