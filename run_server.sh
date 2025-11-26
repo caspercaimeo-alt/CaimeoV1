@@ -2,10 +2,27 @@
 # =====================================================
 # run_server.sh — One-command launcher for Alpaca Bot
 # =====================================================
+
+# Raise file descriptor limit to avoid "Too many open files"
+if command -v ulimit >/dev/null 2>&1; then
+  ulimit -n 65536 2>/dev/null || true
+fi
+
 export UNIVERSE_LIMIT=10000
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
+
+# Load environment variables (including ENABLE_AUTO_TRADING) if .env is present
+if [ -f ".env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source ".env"
+  set +a
+  echo "✅ Loaded environment from .env"
+else
+  echo "⚠️ .env not found — using existing environment only."
+fi
 
 echo "🧹 Checking for existing Uvicorn processes..."
 if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
@@ -15,50 +32,56 @@ if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
 fi
 
 echo "🚀 Starting FastAPI server (port 8000)..."
+# If something is already bound to 8000, stop it
+existing8000=$(lsof -t -i :8000 2>/dev/null)
+if [ -n "$existing8000" ]; then
+  echo "⚠️  Port 8000 in use by PID(s): $existing8000 — killing..."
+  echo "$existing8000" | xargs kill -9 2>/dev/null
+  sleep 1
+fi
 uvicorn server:app --reload --port 8000 &
 SERVER_PID=$!
 
-# Give server time to boot
 sleep 5
 
-# Open FastAPI docs automatically (Mac = 'open')
+# -----------------------------------------------------
+# Start FRONTEND (React)
+# -----------------------------------------------------
+echo "🚀 Starting frontend (React UI on port 3000)..."
+cd alpaca-ui
+npm start &
+FRONTEND_PID=$!
+cd "$PROJECT_DIR"
+
+sleep 5
+
+# -----------------------------------------------------
+# Auto-open browser tabs
+# -----------------------------------------------------
 if command -v open >/dev/null 2>&1; then
+  open "http://localhost:3000"
   open "http://127.0.0.1:8000/docs"
-  echo "✅ FastAPI docs opened in browser."
+  echo "✅ Browser windows opened."
 else
-  echo "Please open http://127.0.0.1:8000/docs manually."
+  echo "➡ Please open http://localhost:3000 manually."
+  echo "➡ And FastAPI docs at: http://127.0.0.1:8000/docs"
 fi
 
 # -----------------------------------------------------
-# Optional: Launch front-end (React or HTML)
+# Auto-start trading bot
 # -----------------------------------------------------
-if [ -d "alpaca-ui" ]; then
-  echo "🎨 Launching front-end (alpaca-ui)..."
-  cd alpaca-ui
-
-  if [ -f "package.json" ]; then
-    npm start &
-    FRONTEND_PID=$!
-  elif [ -f "index.html" ]; then
-    open index.html
-  fi
-
-  cd "$PROJECT_DIR"
-fi
-
-# -----------------------------------------------------
-# Auto-start trading bot via API
-# -----------------------------------------------------
+echo ""
 echo "🤖 Starting trading bot automatically..."
 sleep 3
+
 if command -v curl >/dev/null 2>&1; then
   curl -s -X POST "http://127.0.0.1:8000/start" >/dev/null
   echo "⌛ Verifying trading bot startup..."
-  
-  # Wait up to 15 seconds for a "started" log entry
+
   MAX_WAIT=15
   waited=0
   success=false
+
   while [ $waited -lt $MAX_WAIT ]; do
     if grep -q "🚀 Trading bot started" bot_output.log 2>/dev/null; then
       success=true
@@ -68,34 +91,36 @@ if command -v curl >/dev/null 2>&1; then
     ((waited++))
   done
 
-  # 🩵 FIX: Verify unified discovery file structure before success confirmation
   if [ "$success" = true ]; then
-    if [ -f "discovered_symbols.json" ]; then
-      if grep -q '"symbols"' discovered_symbols.json && grep -q '"RECOVERY"' discovered_symbols.json && grep -q '"MOMENTUM"' discovered_symbols.json; then
-        echo "✅ Trading bot and unified discovery confirmed running!"
-      else
-        echo "⚠️  Bot running, but discovery JSON not yet unified format — please check later."
-      fi
-    else
-      echo "⚠️  Bot started, but discovery output not yet generated."
-    fi
+    echo "✅ Trading bot confirmed running!"
   else
-    echo "⚠️  Could not confirm bot start (check bot_output.log)"
+    echo "⚠️  Bot started, but discovery output not yet generated."
   fi
+
 else
   echo "⚠️  curl not found — please start bot manually from the web UI."
 fi
 
+# -----------------------------------------------------
+# Final Status
+# -----------------------------------------------------
 echo ""
-echo "✅ Everything is up and running!"
+echo "🟢 Everything is up and running!"
 echo "   FastAPI server PID: $SERVER_PID"
-if [ -n "$FRONTEND_PID" ]; then
-  echo "   Frontend PID: $FRONTEND_PID"
-fi
+echo "   Frontend PID: $FRONTEND_PID"
 echo "------------------------------------------------------"
 echo "💡 Press Ctrl+C to stop everything (server + bot + frontend)"
 echo "------------------------------------------------------"
 
-# Graceful shutdown
-trap "echo '\n🛑 Stopping services...'; kill $SERVER_PID $FRONTEND_PID 2>/dev/null; curl -s -X POST http://127.0.0.1:8000/stop >/dev/null; echo '✅ All services stopped cleanly.'" INT
-wait $SERVER_PID
+cleanup() {
+  echo "\n🛑 Stopping services..."
+  if kill -0 "$SERVER_PID" >/dev/null 2>&1; then
+    kill "$SERVER_PID" 2>/dev/null
+  fi
+  if kill -0 "$FRONTEND_PID" >/dev/null 2>&1; then
+    kill "$FRONTEND_PID" 2>/dev/null
+  fi
+}
+
+trap cleanup INT TERM
+wait

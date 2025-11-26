@@ -16,11 +16,14 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import trade_logger
+
 UNIVERSE_LIMIT = 10000
 DISCOVERY_OUTPUT = "discovered_full.json"
 
 # --- Global live progress tracker ---
 PROGRESS = {"current": 0, "total": 0}
+_SESSION = None  # shared HTTP session to reuse connections
 
 # ------------------------------------------------------------
 # Logging helper
@@ -30,6 +33,18 @@ def _log(msg: str):
     with open("bot_output.log", "a") as f:
         f.write(f"[{datetime.now()}] {msg}\n")
 
+
+def _session():
+    """Return a shared session with a slightly larger connection pool."""
+    global _SESSION
+    if _SESSION is None:
+        s = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(pool_connections=32, pool_maxsize=64)
+        s.mount("http://", adapter)
+        s.mount("https://", adapter)
+        _SESSION = s
+    return _SESSION
+
 # ------------------------------------------------------------
 # Load tradable symbols via Alpaca
 # ------------------------------------------------------------
@@ -37,7 +52,7 @@ def list_tradable_symbols_via_alpaca(api_key: str, api_secret: str, limit: int) 
     base = "https://paper-api.alpaca.markets"
     headers = {"APCA-API-KEY-ID": api_key, "APCA-API-SECRET-KEY": api_secret}
     try:
-        r = requests.get(f"{base}/v2/assets", headers=headers, timeout=15)
+        r = _session().get(f"{base}/v2/assets", headers=headers, timeout=8)
         r.raise_for_status()
         assets = r.json()
         tradable = [a["symbol"] for a in assets if a.get("tradable")]
@@ -67,7 +82,7 @@ def fetch_price_history(symbol: str, api_key: str, api_secret: str, days: int = 
         url = f"https://data.alpaca.markets/v2/stocks/{symbol}/bars"
         headers = {"APCA-API-KEY-ID": api_key, "APCA-API-SECRET-KEY": api_secret}
         params = {"start": start.isoformat(), "end": end.isoformat(), "timeframe": "1Day", "limit": days}
-        r = requests.get(url, headers=headers, params=params, timeout=6)
+        r = _session().get(url, headers=headers, params=params, timeout=4)
         r.raise_for_status()
         data = r.json().get("bars", [])
         if not data:
@@ -184,7 +199,7 @@ def get_quarterly_revenue_growth(symbol: str, api_key: str = None, api_secret: s
             base = "https://data.alpaca.markets/v1beta1"
             url = f"{base}/fundamentals/{symbol}"
             headers = {"APCA-API-KEY-ID": api_key, "APCA-API-SECRET-KEY": api_secret}
-            r = requests.get(url, headers=headers, timeout=10)
+            r = _session().get(url, headers=headers, timeout=6)
             r.raise_for_status()
             data = r.json()
 
@@ -250,6 +265,7 @@ def strategy_momentum3(symbols: List[str], api_key: str, api_secret: str) -> Lis
 
             return {
                 "symbol": s,
+                "strategy": "3 Day Strategy",
                 "gain_3d": round(change_pct, 1),
                 "vol_ratio": round(vol_ratio, 2),
                 "volatility": round(volatility, 2),
@@ -311,6 +327,7 @@ def strategy_reversal5(symbols: List[str], api_key: str, api_secret: str) -> Lis
 
             return {
                 "symbol": s,
+                "strategy": "5 Day Strategy",
                 "drop_5d": round(drop_pct, 1),
                 "rebound": round(rebound, 1),
                 "volatility": round(volatility, 2),
@@ -361,8 +378,19 @@ def discover_symbols(api_key: str, api_secret: str) -> Dict[str, List[Dict]]:
         momentum3_results = future_m.result()
         reversal5_results = future_r.result()
 
-    combined = {s["symbol"]: s for s in (momentum3_results + reversal5_results) if s}.values()
-    df = pd.DataFrame(combined)
+    combined: Dict[str, Dict] = {}
+    for s in (momentum3_results + reversal5_results):
+        if not s:
+            continue
+        sym = s["symbol"]
+        if sym not in combined:
+            combined[sym] = s
+            continue
+        existing = combined[sym]
+        if s.get("score", 0) > existing.get("score", 0):
+            combined[sym] = s
+
+    df = pd.DataFrame(combined.values())
 
     if df.empty:
         _log("⚠️ No stocks met criteria after both strategies.")
@@ -392,6 +420,29 @@ def discover_symbols(api_key: str, api_secret: str) -> Dict[str, List[Dict]]:
 
     df = df.sort_values("score", ascending=False).head(40)
     out_list = df.to_dict(orient="records")
+
+    for row in out_list:
+        if "last_price" in row:
+            row["discovered_price"] = row["last_price"]
+        elif "last" in row:
+            row["discovered_price"] = row["last"]
+        else:
+            row["discovered_price"] = None
+
+    for row in out_list:
+        try:
+            trade_logger.append_event(
+                {
+                    "event": "discover",
+                    "symbol": row.get("symbol"),
+                    "strategy": row.get("strategy"),
+                    "price": row.get("discovered_price"),
+                    "confidence": row.get("confidence"),
+                    "score": row.get("score"),
+                }
+            )
+        except Exception:
+            pass
 
     result = {
         "RECOVERY": reversal5_results,
