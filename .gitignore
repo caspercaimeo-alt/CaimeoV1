@@ -7,3 +7,6 @@ __pycache__/
 
 # Ignore system files
 .DS_Store
+bot_output.log
+bot_error.log
+*.log
