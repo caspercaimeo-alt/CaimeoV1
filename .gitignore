@@ -10,3 +10,7 @@ __pycache__/
 bot_output.log
 bot_error.log
 *.log
+discovered_symbols.json
+discovered_full.json
+discovered_previous.json
+trade_events.jsonl
