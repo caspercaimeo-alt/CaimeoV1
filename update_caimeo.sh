@@ -12,8 +12,10 @@ warn()  { printf "WARN: %s\n" "$*" >&2; }
 
 cd "$ROOT"
 
+SSH_CMD="${GIT_SSH_COMMAND:-ssh -i ~/.ssh/id_ed25519_caimeo -o StrictHostKeyChecking=accept-new}"
+
 info "Fetching latest commits..."
-git fetch
+GIT_SSH_COMMAND="$SSH_CMD" git fetch
 
 LOCAL_HEAD=$(git rev-parse HEAD)
 REMOTE_HEAD=$(git rev-parse origin/main)
@@ -22,7 +24,7 @@ if [ "$LOCAL_HEAD" = "$REMOTE_HEAD" ]; then
   info "Already up to date. Restarting services anyway."
 else
   info "Updating to origin/main..."
-  git pull --ff-only
+  GIT_SSH_COMMAND="$SSH_CMD" git pull --ff-only
 fi
 
 info "Stopping existing backend/frontend if running..."
