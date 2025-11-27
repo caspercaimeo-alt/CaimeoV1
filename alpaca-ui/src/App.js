@@ -408,7 +408,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "none",
       borderRadius: "0px",
-      width: "85%",
+      width: "75%",
       margin: "0 auto 40px",
       padding: "20px 0 40px 0",
     },
@@ -427,7 +427,7 @@ setDiscovered(sorted);
     authBox: {
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
-      width: "65%",
+      width: "60%",
       margin: "30px auto",
       textAlign: "center",
       padding: "0",
@@ -482,7 +482,7 @@ setDiscovered(sorted);
       fontSize: "26px",
     },
     table: {
-      width: "85%",
+      width: "80%",
       margin: "0 auto",
       borderCollapse: "collapse",
       backgroundColor: "#FCFBF4",
@@ -511,7 +511,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "none",
       borderRadius: "0px",
-      width: "85%",
+      width: "80%",
       margin: "0 auto 40px",
       padding: "60px 0 30px",
     },
@@ -519,7 +519,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "0",
       borderRadius: "0px",
-      width: "85%",
+      width: "80%",
       margin: "0 auto 40px",
       padding: "60px 0 30px",
     },
@@ -528,7 +528,7 @@ setDiscovered(sorted);
       gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
       justifyItems: "center",
       gap: "2rem",
-      width: "90%",
+      width: "85%",
       margin: "0 auto",
     },
     stockCard: {
@@ -741,17 +741,21 @@ setDiscovered(sorted);
         {/* Status + Live Feed row */}
         <div
           className="status-live-row"
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            gap: "140px",
-            padding: "0 24px",
-            marginTop: "85px",
-            marginBottom: "40px",
-          }}
-        >
-          <div id="status-section" style={{ ...styles.statusBox, width: "28%", margin: "0" }} className="status-card">
+      style={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        gap: "80px",
+        padding: "0 24px",
+        marginTop: "85px",
+        marginBottom: "40px",
+        maxWidth: "1100px",
+        width: "80%",
+        marginLeft: "auto",
+        marginRight: "auto",
+      }}
+    >
+      <div id="status-section" style={{ ...styles.statusBox, width: "32%", margin: "0 auto" }} className="status-card">
             <div
             style={{
               backgroundColor: "#462323",
@@ -813,10 +817,10 @@ setDiscovered(sorted);
 
           <div
             style={{
-              width: "32%",
+              width: "48%",
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
+              alignItems: "center",
             }}
             className="live-feed-card"
             id="live-feed-section"
@@ -824,8 +828,8 @@ setDiscovered(sorted);
             <div
             style={{
               ...styles.sectionHeaderDiv,
-              width: "100%",
-              margin: "0",
+              width: "92%",
+              margin: "0 auto",
               padding: "12px 0",
               marginBottom: "0px",
               borderBottom: "4px solid #FCFBF4",
@@ -838,8 +842,8 @@ setDiscovered(sorted);
             <div
               style={{
                 ...styles.liveFeedBox,
-                width: "90%",
-                margin: "0",
+                width: "92%",
+                margin: "0 auto",
               }}
               className="live-feed-box"
               ref={logsBoxRef}
@@ -854,7 +858,7 @@ setDiscovered(sorted);
       <div style={styles.discoveryWrapper} id="discovery-section" className="discovery-wrapper">
 
         <div
-          style={{ ...styles.sectionHeaderDiv, width: "90%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}
+          style={{ ...styles.sectionHeaderDiv, width: "85%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}
           className="section-header"
         >
           <div
@@ -877,7 +881,7 @@ setDiscovered(sorted);
     backgroundColor: "#FCFBF4",
     border: "4px solid #462323",
     borderRadius: "0 0 10px 10px",
-    width: "99%",
+    width: "95%",
     margin: "0 auto 10px",
     padding: "10px 0",
     textAlign: "center",
