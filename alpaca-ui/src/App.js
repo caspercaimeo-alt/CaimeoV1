@@ -487,7 +487,7 @@ setDiscovered(sorted);
       borderCollapse: "collapse",
       backgroundColor: "#FCFBF4",
       color: "#462323",
-      border: "4px solid "#462323",
+      border: "4px solid #462323",
       borderRadius: "10px",
     },
     th: {
