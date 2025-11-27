@@ -408,7 +408,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "none",
       borderRadius: "0px",
-      width: "60%",
+      width: "55%",
       margin: "0 auto 40px",
       padding: "20px 0 40px 0",
     },
@@ -417,7 +417,7 @@ setDiscovered(sorted);
       color: "#FCFBF4",
       border: "5px solid #FCFBF4",
       borderRadius: "10px",
-      width: "50%",
+      width: "60%",
       margin: "15px auto",
       textAlign: "center",
       padding: "10px 0",
@@ -427,7 +427,7 @@ setDiscovered(sorted);
     authBox: {
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
-      width: "50%",
+      width: "45%",
       margin: "30px auto",
       textAlign: "center",
       padding: "0",
@@ -461,7 +461,7 @@ setDiscovered(sorted);
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
       borderRadius: "12px",
-      padding: "0px 24px 12px",
+      padding: "0px 20px 10px",
       width: "30%",
       margin: "0 auto 30px",
       textAlign: "center",
@@ -631,14 +631,14 @@ setDiscovered(sorted);
     @media (max-width: 900px) {
       .status-live-row { flex-direction: column !important; gap: 32px !important; padding: 0 12px !important; }
       .status-card, .live-feed-card { width: 100% !important; margin: 0 !important; }
-      .live-feed-box { width: 100% !important; max-height: 320px !important; }
-      .auth-wrapper, .auth-box { width: 100% !important; }
+      .live-feed-box { width: 94% !important; max-height: 320px !important; margin: 0 auto !important; }
+      .auth-wrapper, .auth-box { width: 92% !important; }
       .auth-input { width: 100% !important; }
-      .discovery-wrapper, .portfolio-wrapper { width: 100% !important; padding: 30px 12px !important; }
-      .discovery-grid { width: 100% !important; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important; gap: 1rem !important; }
-      .table-wrap { width: 100% !important; overflow-x: auto !important; }
+      .discovery-wrapper, .portfolio-wrapper { width: 94% !important; padding: 24px 12px !important; }
+      .discovery-grid { width: 100% !important; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; gap: 1rem !important; }
+      .table-wrap { width: 94% !important; overflow-x: auto !important; }
       .table-wrap table { min-width: 520px; }
-      .section-header { width: 100% !important; font-size: 24px !important; }
+      .section-header { width: 94% !important; font-size: 24px !important; }
       .nav-links-inline { left: 0 !important; transform: none !important; width: 100% !important; position: static !important; }
     }
 
