@@ -408,7 +408,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "none",
       borderRadius: "0px",
-      width: "70%",
+      width: "60%",
       margin: "0 auto 40px",
       padding: "20px 0 40px 0",
     },
@@ -427,7 +427,7 @@ setDiscovered(sorted);
     authBox: {
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
-      width: "55%",
+      width: "50%",
       margin: "30px auto",
       textAlign: "center",
       padding: "0",
@@ -461,8 +461,8 @@ setDiscovered(sorted);
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
       borderRadius: "12px",
-      padding: "0px 30px 16px",
-      width: "32%",
+      padding: "0px 24px 12px",
+      width: "30%",
       margin: "0 auto 30px",
       textAlign: "center",
       color: "#462323",
@@ -473,7 +473,7 @@ setDiscovered(sorted);
       backgroundColor: "#462323",
       border: "5px solid #FCFBF4",
       borderRadius: "10px",
-      width: "70%",
+      width: "75%",
       margin: "0 auto 20px",
       textAlign: "center",
       padding: "10px 0",
@@ -482,7 +482,7 @@ setDiscovered(sorted);
       fontSize: "26px",
     },
     table: {
-      width: "75%",
+      width: "70%",
       margin: "0 auto",
       borderCollapse: "collapse",
       backgroundColor: "#FCFBF4",
@@ -511,7 +511,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "none",
       borderRadius: "0px",
-      width: "75%",
+      width: "70%",
       margin: "0 auto 40px",
       padding: "60px 0 30px",
     },
@@ -519,15 +519,15 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "0",
       borderRadius: "0px",
-      width: "75%",
+      width: "70%",
       margin: "0 auto 40px",
       padding: "60px 0 30px",
     },
     discoveryGrid: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+      gridTemplateColumns: "repeat(3, minmax(160px, 1fr))",
       justifyItems: "center",
-      gap: "2rem",
+      gap: "1.5rem",
       width: "80%",
       margin: "0 auto",
     },
@@ -536,7 +536,7 @@ setDiscovered(sorted);
       borderRadius: "8px",
       backgroundColor: "#FCFBF4",
       color: "#462323",
-      width: "200px",
+      width: "170px",
       textAlign: "center",
       textDecoration: "none",
       padding: "12px 10px",
@@ -739,49 +739,49 @@ setDiscovered(sorted);
         </div>
 
         {/* Status + Live Feed row */}
-        <div
-          className="status-live-row"
+    <div
+      className="status-live-row"
       style={{
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        gap: "80px",
-        padding: "0 24px",
-        marginTop: "85px",
-        marginBottom: "40px",
-        maxWidth: "1100px",
-        width: "80%",
+        gap: "60px",
+        padding: "0 16px",
+        marginTop: "70px",
+        marginBottom: "36px",
+        maxWidth: "1000px",
+        width: "70%",
         marginLeft: "auto",
         marginRight: "auto",
       }}
     >
       <div id="status-section" style={{ ...styles.statusBox, width: "32%", margin: "0 auto" }} className="status-card">
-            <div
-            style={{
-              backgroundColor: "#462323",
-              color: "#FCFBF4",
-              width: "100%",
-              margin: "0 auto",
-              padding: "12px 14px",
-              borderRadius: "10px 10px 0 0",
-              fontWeight: "900",
-              marginBottom: "24px",
-              borderBottom: "4px solid #FCFBF4",
-            }}
-          >
+        <div
+        style={{
+          backgroundColor: "#462323",
+          color: "#FCFBF4",
+          width: "94%",
+          margin: "0 auto",
+          padding: "10px 12px",
+          borderRadius: "10px 10px 0 0",
+          fontWeight: "900",
+          marginBottom: "24px",
+          borderBottom: "4px solid #FCFBF4",
+        }}
+      >
               <h3 style={{ margin: 0, fontSize: "38px" }}>Bot Status</h3>
             </div>
             <div
               style={{
                 display: "inline-block",
-                padding: "13px 26px",
+                padding: "10px 20px",
                 borderRadius: "999px",
                 backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
                 color: "#FCFBF4",
                 fontWeight: "900",
-                fontSize: "22px",
-                marginTop: "30px",
-                marginBottom: "26px",
+                fontSize: "18px",
+                marginTop: "24px",
+                marginBottom: "20px",
                 border: "2px solid #FCFBF4",
               }}
             >
@@ -816,7 +816,7 @@ setDiscovered(sorted);
 
           <div
             style={{
-              width: "48%",
+              width: "45%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -827,7 +827,7 @@ setDiscovered(sorted);
             <div
             style={{
               ...styles.sectionHeaderDiv,
-              width: "92%",
+              width: "88%",
               margin: "0 auto",
               padding: "12px 0",
               marginBottom: "0px",
@@ -841,7 +841,7 @@ setDiscovered(sorted);
             <div
               style={{
                 ...styles.liveFeedBox,
-                width: "92%",
+                width: "88%",
                 margin: "0 auto",
               }}
               className="live-feed-box"
@@ -857,7 +857,7 @@ setDiscovered(sorted);
       <div style={styles.discoveryWrapper} id="discovery-section" className="discovery-wrapper">
 
         <div
-          style={{ ...styles.sectionHeaderDiv, width: "85%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}
+          style={{ ...styles.sectionHeaderDiv, width: "75%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}
           className="section-header"
         >
           <div
@@ -880,7 +880,7 @@ setDiscovered(sorted);
     backgroundColor: "#FCFBF4",
     border: "4px solid #462323",
     borderRadius: "0 0 10px 10px",
-    width: "95%",
+    width: "85%",
     margin: "0 auto 10px",
     padding: "10px 0",
     textAlign: "center",
