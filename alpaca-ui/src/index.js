@@ -11,6 +11,13 @@ root.render(
   </React.StrictMode>
 );
 
+// Proactively remove any old service workers so clients don't see stale bundles.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    regs.forEach((reg) => reg.unregister().catch(() => {}));
+  }).catch(() => {});
+}
+
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
