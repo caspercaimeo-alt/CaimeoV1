@@ -28,11 +28,13 @@ MAX_POSITIONS = int(os.getenv("MAX_POSITIONS", "3"))
 MIN_TRADE_CONFIDENCE = os.getenv("MIN_TRADE_CONFIDENCE", "B").upper()
 RISK_PER_TRADE_PCT = float(os.getenv("RISK_PER_TRADE_PCT", "1.0"))  # % of equity
 STOP_LOSS_PCT = float(os.getenv("STOP_LOSS_PCT", "3.0"))
-TAKE_PROFIT_PCT = float(os.getenv("TAKE_PROFIT_PCT", "6.0"))
-TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "3.0"))
+TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for attached stops
 MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "10"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
+
+# Symbols that already have protective exits attached in this session
+ATTACHED_EXITS = set()
 
 
 def _log(msg: str) -> None:
@@ -129,13 +131,14 @@ def _init_api(key: str, secret: str, base_url: str) -> Optional[REST]:
         return None
 
 
-def _current_state(api: REST) -> Tuple[float, List[str], List[str]]:
-    """Return (equity, open_position_symbols, open_order_symbols)."""
+def _current_state(api: REST) -> Tuple[float, List[str], List[str], List]:
+    """Return (equity, open_position_symbols, open_order_symbols, position_objects)."""
     acct = api.get_account()
     equity = float(getattr(acct, "equity", 0))
-    positions = [p.symbol for p in api.list_positions()] if hasattr(api, "list_positions") else []
+    position_objs = api.list_positions() if hasattr(api, "list_positions") else []
+    positions = [p.symbol for p in position_objs]
     orders = [o.symbol for o in api.list_orders(status="open")] if hasattr(api, "list_orders") else []
-    return equity, positions, orders
+    return equity, positions, orders, position_objs
 
 
 def _calc_qty(last_price: float, equity: float) -> int:
@@ -198,6 +201,55 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
     except Exception as e:
         _log(f"⚠️ Unexpected error placing {symbol}: {e}")
     return False
+
+
+def _attach_exit_orders(api: REST, positions: List, open_order_symbols: List[str]) -> None:
+    """
+    For any existing position lacking an open order, attach a trailing-stop exit
+    so legacy holdings get protection even if the bot did not open them.
+    """
+    global ATTACHED_EXITS
+    for pos in positions:
+        sym = getattr(pos, "symbol", None)
+        if not sym:
+            continue
+        if sym in open_order_symbols or sym in ATTACHED_EXITS:
+            continue
+
+        try:
+            qty_raw = getattr(pos, "qty", None)
+            qty = abs(int(float(qty_raw))) if qty_raw is not None else 0
+        except Exception:
+            qty = 0
+        if qty <= 0:
+            continue
+
+        side = "sell" if float(getattr(pos, "qty", 0)) >= 0 else "buy"
+        trail_pct = TRAIL_STOP_PCT
+
+        try:
+            api.submit_order(
+                symbol=sym,
+                side=side,
+                type="trailing_stop",
+                qty=qty,
+                trail_percent=trail_pct,
+                time_in_force="gtc",
+            )
+            ATTACHED_EXITS.add(sym)
+            _log(f"🛡️ Attached trailing stop for existing position {sym} qty={qty} trail={trail_pct}%")
+            trade_logger.append_event(
+                {
+                    "event": "exit_attached",
+                    "symbol": sym,
+                    "qty": qty,
+                    "trail_percent": trail_pct,
+                }
+            )
+        except APIError as e:
+            _log(f"⚠️ Alpaca API error attaching exit for {sym}: {e}")
+        except Exception as e:
+            _log(f"⚠️ Unexpected error attaching exit for {sym}: {e}")
 
 
 def _count_entries_this_week(path: str) -> int:
@@ -270,12 +322,22 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
                 time.sleep(TRADE_POLL_SEC)
                 continue
 
+            equity, positions, open_orders, position_objs = _current_state(api)
+
+            # Always try to attach exits even if we're waiting for market open.
+            try:
+                to_remove = set(ATTACHED_EXITS) - set(positions)
+                for sym in to_remove:
+                    ATTACHED_EXITS.discard(sym)
+                _attach_exit_orders(api, position_objs, open_orders)
+            except Exception as e:
+                _log(f"⚠️ Exit attachment step failed: {e}")
+
             if not _market_ready(api):
                 _log(f"⏸ Waiting for market + {MINUTES_AFTER_OPEN}m post-open window before entries.")
                 time.sleep(TRADE_POLL_SEC)
                 continue
 
-            equity, positions, open_orders = _current_state(api)
             active_count = len(positions) + len(open_orders)
             slots = max(0, MAX_POSITIONS - active_count)
             if slots <= 0:
