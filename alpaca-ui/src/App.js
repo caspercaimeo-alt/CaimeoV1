@@ -435,7 +435,7 @@ setDiscovered(sorted);
       color: "black",
     },
     authContent: {
-      padding: "32px 28px 24px",
+      padding: "32px 24px 24px",
     },
     authInput: {
       width: "80%",
@@ -482,12 +482,12 @@ setDiscovered(sorted);
       fontSize: "26px",
     },
     table: {
-      width: "70%",
+      width: "100%",
       margin: "0 auto",
       borderCollapse: "collapse",
       backgroundColor: "#FCFBF4",
       color: "#462323",
-      border: "4px solid #462323",
+      border: "4px solid "#462323",
       borderRadius: "10px",
     },
     th: {
@@ -744,17 +744,17 @@ setDiscovered(sorted);
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        gap: "28px",
+        gap: "24px",
         padding: "0 16px",
         marginTop: "70px",
         marginBottom: "36px",
-        maxWidth: "920px",
-        width: "72%",
+        maxWidth: "900px",
+        width: "70%",
         marginLeft: "auto",
         marginRight: "auto",
       }}
     >
-      <div id="status-section" style={{ ...styles.statusBox, width: "33%", margin: "0 auto" }} className="status-card">
+      <div id="status-section" style={{ ...styles.statusBox, width: "35%", margin: "0 auto" }} className="status-card">
         <div
         style={{
           backgroundColor: "#462323",
@@ -815,7 +815,7 @@ setDiscovered(sorted);
 
           <div
             style={{
-              width: "52%",
+              width: "55%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -1131,7 +1131,7 @@ const growth =
 
       {/* Portfolio + Open Orders */}
       <div style={{ ...styles.portfolioWrapper, paddingTop: "0px" }} id="portfolio-section" className="portfolio-wrapper">
-        <div className="table-wrap">
+        <div className="table-wrap" style={styles.tableWrap}>
         <table style={{ ...styles.table, width: "100%", border: "0" }}>
           <thead>
             <tr>
@@ -1207,8 +1207,8 @@ const growth =
           </tbody>
         </table>
         </div>
-        <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "90%" }}>
+        <div className="table-wrap" style={styles.tableWrap}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "100%" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={6}>
@@ -1251,8 +1251,8 @@ const growth =
           </tbody>
         </table>
         </div>
-        <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "90%" }}>
+        <div className="table-wrap" style={styles.tableWrap}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "100%" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={5}>
@@ -1322,3 +1322,7 @@ const growth =
 }
 
 export default App;
+    tableWrap: {
+      width: "100%",
+      overflowX: "auto",
+    },
