@@ -703,13 +703,13 @@ setDiscovered(sorted);
           >
             <h2 style={{ margin: 0, fontSize: "38px", lineHeight: 1.1 }}>API Auth</h2>
           </div>
-          <div
-            style={{
-              backgroundColor: "#FCFBF4",
-              borderRadius: "0 0 8px 8px",
-            }}
-          >
-            <div style={{ ...styles.authContent, paddingTop: "0px" }}>
+            <div
+              style={{
+                backgroundColor: "#FCFBF4",
+                borderRadius: "0 0 8px 8px",
+              }}
+            >
+            <div style={{ ...styles.authContent, paddingTop: "24px" }}>
               <form onSubmit={submitKeys}>
                 <input
                   style={styles.authInput}
