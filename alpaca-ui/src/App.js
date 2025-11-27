@@ -6,6 +6,7 @@ function App() {
   const [logs, setLogs] = useState("");
   const [status, setStatus] = useState("Stopped");
   const [discovered, setDiscovered] = useState([]);
+  const [cardsToShow, setCardsToShow] = useState(16);
   const [portfolio, setPortfolio] = useState([]);
   const [orders, setOrders] = useState([]);
   const [trades, setTrades] = useState([]);
@@ -41,6 +42,12 @@ function App() {
     }
   }
 
+  // Adapt number of discovery cards to viewport (4 full rows)
+  const computeCardsToShow = (width) => {
+    const columns = Math.min(6, Math.max(1, Math.floor((width - 60) / 220)));
+    return columns * 4;
+  };
+
   // ---- Fetch Discovered Stocks ----
   async function fetchDiscovered() {
   try {
@@ -67,14 +74,13 @@ function App() {
           return (order[b.confidence] || 0) - (order[a.confidence] || 0);
           });
 
-const top16 = sorted.slice(0, 16);
-setDiscovered(top16);
+setDiscovered(sorted);
 
 
     setMeta({
       total_scanned: 10000,
       after_filters: list.length,
-      displayed: top16.length,
+      displayed: Math.min(computeCardsToShow(window.innerWidth), sorted.length),
     });
   } catch (err) {
     console.error("Failed to fetch discovered stocks:", err);
@@ -223,14 +229,27 @@ setDiscovered(top16);
     fetchPortfolio();
     fetchStatus();
     fetchProgress(); // start polling discovery progress
+    const updateCards = () => setCardsToShow(computeCardsToShow(window.innerWidth));
+    updateCards();
+    window.addEventListener("resize", updateCards);
 
     const statusInterval = setInterval(() => {
       fetchStatus();
       fetchProgress();
     }, 5000);
 
-    return () => clearInterval(statusInterval);
+    return () => {
+      clearInterval(statusInterval);
+      window.removeEventListener("resize", updateCards);
+    };
   }, []);
+
+  useEffect(() => {
+    setMeta((prev) => ({
+      ...prev,
+      displayed: Math.min(cardsToShow, prev.after_filters || 0),
+    }));
+  }, [cardsToShow]);
 
   // Poll portfolio when authenticated
   useEffect(() => {
@@ -416,7 +435,7 @@ setDiscovered(top16);
       color: "black",
     },
     authContent: {
-      padding: "40px 50px 30px",
+      padding: "50px 50px 30px",
     },
     authInput: {
       width: "80%",
@@ -607,8 +626,33 @@ setDiscovered(top16);
     },
   };
 
+  // Mobile-friendly overrides layered atop inline desktop styles
+  const responsiveCss = `
+    @media (max-width: 900px) {
+      .status-live-row { flex-direction: column !important; gap: 32px !important; padding: 0 12px !important; }
+      .status-card, .live-feed-card { width: 100% !important; margin: 0 !important; }
+      .live-feed-box { width: 100% !important; max-height: 320px !important; }
+      .auth-wrapper, .auth-box { width: 100% !important; }
+      .auth-input { width: 100% !important; }
+      .discovery-wrapper, .portfolio-wrapper { width: 100% !important; padding: 30px 12px !important; }
+      .discovery-grid { width: 100% !important; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important; gap: 1rem !important; }
+      .table-wrap { width: 100% !important; overflow-x: auto !important; }
+      .table-wrap table { min-width: 520px; }
+      .section-header { width: 100% !important; font-size: 24px !important; }
+      .nav-links-inline { left: 0 !important; transform: none !important; width: 100% !important; position: static !important; }
+    }
+
+    @media (max-width: 540px) {
+      .title { font-size: 26px !important; }
+      .section-header { font-size: 20px !important; }
+      .discovery-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; }
+      .live-feed-box { max-height: 260px !important; }
+    }
+  `;
+
   return (
     <div style={styles.page}>
+      <style>{responsiveCss}</style>
       {/* Nav */}
       <div style={styles.navBar}>
         <div
@@ -619,8 +663,9 @@ setDiscovered(top16);
           onMouseEnter={() => setNavOpen(true)}
           onMouseLeave={() => setNavOpen(false)}
         >
-          <h1 style={styles.title}>CAIMEO</h1>
+          <h1 style={styles.title} className="title">CAIMEO</h1>
           <div
+            className="nav-links-inline"
             style={{
               ...styles.navLinksInline,
               display: navOpen ? "flex" : "none",
@@ -638,21 +683,25 @@ setDiscovered(top16);
       </div>
 
       {/* Auth Section + Status */}
-      <div id="auth-section" style={styles.authWrapper}>
-        <div style={styles.authBox}>
+      <div id="auth-section" style={styles.authWrapper} className="auth-wrapper">
+        <div style={styles.authBox} className="auth-box">
           <div
             style={{
-              ...styles.authHeader,
-              width: "100%",
-              margin: "0 auto",
-              boxSizing: "border-box",
-              padding: "10px 16px",
+              backgroundColor: "#462323",
+              color: "#FCFBF4",
+              width: "calc(100% + 4px)",
+              marginLeft: "-2px",
+              marginRight: "-2px",
+              padding: "12px 18px",
               borderRadius: "8px 8px 0 0",
-              backgroundColor: "#FCFBF4",
-              color: "#462323",
+              fontWeight: "900",
+              fontSize: "32px",
+              borderBottom: "4px solid #FCFBF4",
+              boxSizing: "border-box",
             }}
+            className="section-header"
           >
-            <h2>API Authentication</h2>
+            <h2 style={{ margin: 0, fontSize: "38px", lineHeight: 1.1 }}>API Auth</h2>
           </div>
           <div
             style={{
@@ -664,6 +713,7 @@ setDiscovered(top16);
               <form onSubmit={submitKeys}>
                 <input
                   style={styles.authInput}
+                  className="auth-input"
                   type="text"
                   placeholder="API Key"
                   value={apiKey}
@@ -672,6 +722,7 @@ setDiscovered(top16);
                 <br />
                 <input
                   style={styles.authInput}
+                  className="auth-input"
                   type="password"
                   placeholder="API Secret"
                   value={apiSecret}
@@ -689,6 +740,7 @@ setDiscovered(top16);
 
         {/* Status + Live Feed row */}
         <div
+          className="status-live-row"
           style={{
             display: "flex",
             alignItems: "flex-start",
@@ -699,20 +751,21 @@ setDiscovered(top16);
             marginBottom: "40px",
           }}
         >
-          <div id="status-section" style={{ ...styles.statusBox, width: "28%", margin: "0" }}>
+          <div id="status-section" style={{ ...styles.statusBox, width: "28%", margin: "0" }} className="status-card">
             <div
-              style={{
-                backgroundColor: "#462323",
-                color: "#FCFBF4",
-                width: "calc(100% + 34px)",
-                marginLeft: "-30px",
-                marginRight: "0px",
-                padding: "10px 14px",
-                borderRadius: "0px",
-                fontWeight: "900",
-                marginBottom: "24px",
-              }}
-            >
+            style={{
+              backgroundColor: "#462323",
+              color: "#FCFBF4",
+              width: "calc(100% + 34px)",
+              marginLeft: "-30px",
+              marginRight: "0px",
+              padding: "10px 14px",
+              borderRadius: "0px",
+              fontWeight: "900",
+              marginBottom: "24px",
+              borderBottom: "4px solid #FCFBF4",
+            }}
+          >
               <h3 style={{ margin: 0, fontSize: "38px" }}>Bot Status</h3>
             </div>
             <div
@@ -765,20 +818,21 @@ setDiscovered(top16);
               flexDirection: "column",
               alignItems: "flex-start",
             }}
+            className="live-feed-card"
             id="live-feed-section"
           >
             <div
-              style={{
-                ...styles.sectionHeaderDiv,
-                width: "100%",
-                margin: "0",
-                padding: "12px 0",
-                marginBottom: "0px",
-                borderBottom: "0",
-                borderRadius: "10px 10px 0 0",
-                borderColor: "#462323",
-              }}
-            >
+            style={{
+              ...styles.sectionHeaderDiv,
+              width: "100%",
+              margin: "0",
+              padding: "12px 0",
+              marginBottom: "0px",
+              borderBottom: "4px solid #FCFBF4",
+              borderRadius: "10px 10px 0 0",
+              borderColor: "#462323",
+            }}
+          >
               <h2 style={{ margin: 0, fontSize: "38px", lineHeight: "1.1" }}>Live Feed</h2>
             </div>
             <div
@@ -787,6 +841,7 @@ setDiscovered(top16);
                 width: "90%",
                 margin: "0",
               }}
+              className="live-feed-box"
               ref={logsBoxRef}
             >
               <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{logs}</pre>
@@ -796,9 +851,12 @@ setDiscovered(top16);
       </div>
 
       {/* Discovered Stocks */}
-      <div style={styles.discoveryWrapper} id="discovery-section">
+      <div style={styles.discoveryWrapper} id="discovery-section" className="discovery-wrapper">
 
-        <div style={{ ...styles.sectionHeaderDiv, width: "90%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}>
+        <div
+          style={{ ...styles.sectionHeaderDiv, width: "90%", backgroundColor: "transparent", border: "none", color: "#FCFBF4" }}
+          className="section-header"
+        >
           <div
             style={{
               backgroundColor: "#462323",
@@ -856,9 +914,9 @@ setDiscovered(top16);
 </div>
 </div>
 
-        <div style={styles.discoveryGrid}>
+        <div style={styles.discoveryGrid} className="discovery-grid">
           {discovered.length > 0 ? (
-            discovered.map((item, i) => {
+            discovered.slice(0, Math.min(cardsToShow, discovered.length)).map((item, i) => {
               const symbol = item.symbol || item;
               const url = `https://finance.yahoo.com/quote/${symbol}`;
               const arrow = (up) => (up ? "▲" : "▼");
@@ -1070,7 +1128,8 @@ const growth =
       </div>
 
       {/* Portfolio + Open Orders */}
-      <div style={{ ...styles.portfolioWrapper, paddingTop: "0px" }} id="portfolio-section">
+      <div style={{ ...styles.portfolioWrapper, paddingTop: "0px" }} id="portfolio-section" className="portfolio-wrapper">
+        <div className="table-wrap">
         <table style={{ ...styles.table, width: "100%", border: "0" }}>
           <thead>
             <tr>
@@ -1145,6 +1204,8 @@ const growth =
             )}
           </tbody>
         </table>
+        </div>
+        <div className="table-wrap">
         <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
           <thead>
             <tr>
@@ -1187,6 +1248,8 @@ const growth =
             )}
           </tbody>
         </table>
+        </div>
+        <div className="table-wrap">
         <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
           <thead>
             <tr>
@@ -1249,6 +1312,7 @@ const growth =
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
     </div>
