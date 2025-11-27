@@ -435,7 +435,7 @@ setDiscovered(sorted);
       color: "black",
     },
     authContent: {
-      padding: "36px 32px 28px",
+      padding: "32px 28px 24px",
     },
     authInput: {
       width: "80%",
@@ -686,17 +686,16 @@ setDiscovered(sorted);
       <div id="auth-section" style={styles.authWrapper} className="auth-wrapper">
         <div style={styles.authBox} className="auth-box">
           <div
-            style={{
-              backgroundColor: "#462323",
-              color: "#FCFBF4",
-              width: "calc(100% + 4px)",
-              marginLeft: "-2px",
-              marginRight: "-2px",
-              padding: "12px 18px",
-              borderRadius: "8px 8px 0 0",
-              fontWeight: "900",
-              fontSize: "32px",
-              borderBottom: "4px solid #FCFBF4",
+          style={{
+            backgroundColor: "#462323",
+            color: "#FCFBF4",
+            width: "100%",
+            margin: "0 auto",
+            padding: "12px 18px",
+            borderRadius: "8px 8px 0 0",
+            fontWeight: "900",
+            fontSize: "32px",
+            borderBottom: "4px solid #FCFBF4",
               boxSizing: "border-box",
             }}
             className="section-header"
@@ -745,17 +744,17 @@ setDiscovered(sorted);
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        gap: "32px",
+        gap: "28px",
         padding: "0 16px",
         marginTop: "70px",
         marginBottom: "36px",
-        maxWidth: "940px",
-        width: "70%",
+        maxWidth: "920px",
+        width: "72%",
         marginLeft: "auto",
         marginRight: "auto",
       }}
     >
-      <div id="status-section" style={{ ...styles.statusBox, width: "34%", margin: "0 auto" }} className="status-card">
+      <div id="status-section" style={{ ...styles.statusBox, width: "33%", margin: "0 auto" }} className="status-card">
         <div
         style={{
           backgroundColor: "#462323",
@@ -816,7 +815,7 @@ setDiscovered(sorted);
 
           <div
             style={{
-              width: "50%",
+              width: "52%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -1209,7 +1208,7 @@ const growth =
         </table>
         </div>
         <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "85%", transform: "scale(0.95)", transformOrigin: "top center" }}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "90%" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={6}>
@@ -1253,7 +1252,7 @@ const growth =
         </table>
         </div>
         <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "85%", transform: "scale(0.95)", transformOrigin: "top center" }}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "90%" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={5}>
