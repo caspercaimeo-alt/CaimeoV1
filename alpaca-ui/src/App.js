@@ -417,7 +417,7 @@ setDiscovered(sorted);
       color: "#FCFBF4",
       border: "5px solid #FCFBF4",
       borderRadius: "10px",
-      width: "60%",
+      width: "100%",
       margin: "15px auto",
       textAlign: "center",
       padding: "10px 0",
@@ -435,7 +435,7 @@ setDiscovered(sorted);
       color: "black",
     },
     authContent: {
-      padding: "50px 50px 30px",
+      padding: "36px 32px 28px",
     },
     authInput: {
       width: "80%",
@@ -461,8 +461,8 @@ setDiscovered(sorted);
       backgroundColor: "#FCFBF4",
       border: "4px solid #462323",
       borderRadius: "12px",
-      padding: "0px 20px 10px",
-      width: "30%",
+      padding: "0px 18px 10px",
+      width: "32%",
       margin: "0 auto 30px",
       textAlign: "center",
       color: "#462323",
@@ -492,15 +492,15 @@ setDiscovered(sorted);
     },
     th: {
       border: "2px solid #462323",
-      padding: "10px",
+      padding: "8px",
       backgroundColor: "#462323",
       color: "#FCFBF4",
-      fontSize: "18px",
+      fontSize: "14px",
     },
     td: {
       border: "2px solid #462323",
-      padding: "8px",
-      fontSize: "16px",
+      padding: "6px",
+      fontSize: "12px",
     },
     gainLoss: {
       border: "2px solid #462323",
@@ -519,7 +519,7 @@ setDiscovered(sorted);
       backgroundColor: "transparent",
       border: "0",
       borderRadius: "0px",
-      width: "70%",
+      width: "90%",
       margin: "0 auto 40px",
       padding: "60px 0 30px",
     },
@@ -613,14 +613,14 @@ setDiscovered(sorted);
       boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
     },
     tradeButton: {
-      padding: "10px 24px",
+      padding: "8px 14px",
       marginTop: "10px",
-      border: "3px solid #462323",
+      border: "2px solid #462323",
       borderRadius: "8px",
       backgroundColor: "#FCFBF4",
       color: "#462323",
       fontWeight: "700",
-      fontSize: "16px",
+      fontSize: "13px",
       cursor: "pointer",
       marginRight: "8px",
     },
@@ -745,24 +745,24 @@ setDiscovered(sorted);
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
-        gap: "60px",
+        gap: "32px",
         padding: "0 16px",
         marginTop: "70px",
         marginBottom: "36px",
-        maxWidth: "1000px",
+        maxWidth: "940px",
         width: "70%",
         marginLeft: "auto",
         marginRight: "auto",
       }}
     >
-      <div id="status-section" style={{ ...styles.statusBox, width: "32%", margin: "0 auto" }} className="status-card">
+      <div id="status-section" style={{ ...styles.statusBox, width: "34%", margin: "0 auto" }} className="status-card">
         <div
         style={{
           backgroundColor: "#462323",
           color: "#FCFBF4",
-          width: "94%",
+          width: "100%",
           margin: "0 auto",
-          padding: "10px 12px",
+          padding: "10px 10px",
           borderRadius: "10px 10px 0 0",
           fontWeight: "900",
           marginBottom: "24px",
@@ -816,7 +816,7 @@ setDiscovered(sorted);
 
           <div
             style={{
-              width: "45%",
+              width: "50%",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -827,7 +827,7 @@ setDiscovered(sorted);
             <div
             style={{
               ...styles.sectionHeaderDiv,
-              width: "88%",
+              width: "100%",
               margin: "0 auto",
               padding: "12px 0",
               marginBottom: "0px",
@@ -841,7 +841,7 @@ setDiscovered(sorted);
             <div
               style={{
                 ...styles.liveFeedBox,
-                width: "88%",
+                width: "100%",
                 margin: "0 auto",
               }}
               className="live-feed-box"
@@ -1209,7 +1209,7 @@ const growth =
         </table>
         </div>
         <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "85%", transform: "scale(0.95)", transformOrigin: "top center" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={6}>
@@ -1253,7 +1253,7 @@ const growth =
         </table>
         </div>
         <div className="table-wrap">
-        <table style={{ ...styles.table, marginTop: "64px", width: "70%", transform: "scale(0.9)", transformOrigin: "top center" }}>
+        <table style={{ ...styles.table, marginTop: "64px", width: "85%", transform: "scale(0.95)", transformOrigin: "top center" }}>
           <thead>
             <tr>
               <th style={{ ...styles.th, fontSize: "32px" }} colSpan={5}>
