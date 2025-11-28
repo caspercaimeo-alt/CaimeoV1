@@ -1,0 +1,51 @@
+Auto-trader parameters and flow (current defaults)
+-------------------------------------------------
+CONFIG (env vars):
+- APCA_API_BASE_URL: https://paper-api.alpaca.markets
+- TRADE_POLL_SEC: 60
+- MAX_POSITIONS: 3
+- MIN_TRADE_CONFIDENCE: B
+- RISK_PER_TRADE_PCT: 1.0
+- STOP_LOSS_PCT: 3.0
+- TRAIL_STOP_PCT: 6.0 (used unless holiday tighten applies)
+- STOP_EXIT_MODE: trailing (can be stop_limit)
+- STOP_LIMIT_PCT: 3.0 (used when STOP_EXIT_MODE=stop_limit)
+- STOP_LIMIT_SLIPPAGE_PCT: 0.5 (extra % below stop for limit)
+- ENTRY_SLIPPAGE_PCT: 0.3 (limit above last for entries)
+- MINUTES_AFTER_OPEN: 15 (wait after open before buying)
+- MAX_DAY_TRADES_PER_WEEK: 10
+- HOLIDAY_GUARD_ENABLED: true
+- HOLIDAY_SKIP_ENTRY_MINUTES: 90 (pre-close)
+- HOLIDAY_TIGHTEN_MINUTES: 120 (pre-close)
+- HOLIDAY_TIGHTEN_TRAIL_PCT: 2.5
+- HOLIDAY_LONG_CLOSE_HOURS: 20 (treat long gap as holiday)
+
+LOOP FLOW (each cycle):
+1) Load discovered symbols:
+   - Filter by confidence >= MIN_TRADE_CONFIDENCE (B). For numeric confidence: >=0.75=A, >=0.55=B, >=0.35=C, else F. Only A/B/C pass.
+2) Enforce weekly day-trade cap:
+   - MAX_DAY_TRADES_PER_WEEK=10; if reached, skip cycle.
+3) Fetch account state:
+   - Equity, open positions, open orders.
+4) Log order status changes:
+   - Any fill/cancel/reject/expire/stopped logged to trade_events.jsonl.
+5) Holiday guard check:
+   - If minutes_to_close <= HOLIDAY_SKIP_ENTRY_MINUTES (90) or long gap > HOLIDAY_LONG_CLOSE_HOURS (20h): skip new buys.
+   - If minutes_to_close <= HOLIDAY_TIGHTEN_MINUTES (120) or long gap: tighten trailing exits to HOLIDAY_TIGHTEN_TRAIL_PCT (2.5%).
+6) Attach exits to any position lacking one:
+   - Uses STOP_EXIT_MODE (trailing default 6% trail, or stop_limit at 3% down with 0.5% extra for limit); applies tightened trail if guard active.
+7) Market-ready gate:
+   - Require market open and MINUTES_AFTER_OPEN delay (15 min) before buying.
+8) Position cap and sizing:
+   - MAX_POSITIONS=3 total across held + open orders.
+   - Size qty with RISK_PER_TRADE_PCT (1% of equity) and STOP_LOSS_PCT (3% per-share risk basis).
+9) Place entry:
+   - Limit buy at last_price*(1+ENTRY_SLIPPAGE_PCT/100) with ENTRY_SLIPPAGE_PCT=0.3.
+10) Immediately place exit:
+    - trailing_stop with TRAIL_STOP_PCT=6.0 (or tightened value), or
+    - stop_limit at ref_price*(1-STOP_LIMIT_PCT/100) with limit a further STOP_LIMIT_SLIPPAGE_PCT=0.5% below stop.
+11) Sleep TRADE_POLL_SEC (60s) and repeat until stopped.
+
+LOGS TO WATCH:
+- bot_output.log: human-readable events and guardrails.
+- trade_events.jsonl: structured events including order_update fills/cancels.

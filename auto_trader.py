@@ -32,9 +32,19 @@ TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for 
 MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "10"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
+STOP_EXIT_MODE = os.getenv("STOP_EXIT_MODE", "trailing").lower()  # trailing | stop_limit
+STOP_LIMIT_PCT = float(os.getenv("STOP_LIMIT_PCT", str(STOP_LOSS_PCT)))
+STOP_LIMIT_SLIPPAGE_PCT = float(os.getenv("STOP_LIMIT_SLIPPAGE_PCT", "0.5"))  # extra % below stop for limit
+HOLIDAY_GUARD_ENABLED = os.getenv("HOLIDAY_GUARD_ENABLED", "true").lower() == "true"
+HOLIDAY_SKIP_ENTRY_MINUTES = int(os.getenv("HOLIDAY_SKIP_ENTRY_MINUTES", "90"))
+HOLIDAY_TIGHTEN_MINUTES = int(os.getenv("HOLIDAY_TIGHTEN_MINUTES", "120"))
+HOLIDAY_TIGHTEN_TRAIL_PCT = float(os.getenv("HOLIDAY_TIGHTEN_TRAIL_PCT", "2.5"))
+HOLIDAY_LONG_CLOSE_HOURS = float(os.getenv("HOLIDAY_LONG_CLOSE_HOURS", "20"))
 
 # Symbols that already have protective exits attached in this session
 ATTACHED_EXITS = set()
+# Track order status changes to log fills/cancels
+ORDER_STATUS_CACHE: Dict[str, str] = {}
 
 
 def _log(msg: str) -> None:
@@ -153,12 +163,69 @@ def _calc_qty(last_price: float, equity: float) -> int:
     return max(qty, 1) if qty > 0 else 0
 
 
-def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strategy: Optional[str]) -> bool:
+def _submit_exit_order(
+    api: REST,
+    symbol: str,
+    side: str,
+    qty: int,
+    ref_price: Optional[float],
+    trail_override: Optional[float] = None,
+) -> bool:
+    """Submit an exit order using configured mode (trailing or stop-limit)."""
+    try:
+        if STOP_EXIT_MODE == "stop_limit":
+            if ref_price is None or ref_price <= 0:
+                _log(f"⚠️ Cannot place stop-limit for {symbol}: missing ref price.")
+                return False
+            stop_price = round(ref_price * (1 - STOP_LIMIT_PCT / 100), 2)
+            limit_price = round(stop_price * (1 - STOP_LIMIT_SLIPPAGE_PCT / 100), 2)
+            api.submit_order(
+                symbol=symbol,
+                side=side,
+                type="stop_limit",
+                qty=qty,
+                stop_price=stop_price,
+                limit_price=limit_price,
+                time_in_force="gtc",
+            )
+            _log(
+                f"🛑 Stop-limit exit placed for {symbol} qty={qty} stop={stop_price} "
+                f"limit={limit_price} (ref={ref_price})"
+            )
+            return True
+
+        # Default trailing stop behavior
+        trail_pct = trail_override if trail_override is not None else TRAIL_STOP_PCT
+        api.submit_order(
+            symbol=symbol,
+            side=side,
+            type="trailing_stop",
+            qty=qty,
+            trail_percent=trail_pct,
+            time_in_force="gtc",
+        )
+        _log(f"🛡️ Trailing stop exit placed for {symbol} qty={qty} trail={trail_pct}%")
+        return True
+    except APIError as e:
+        _log(f"⚠️ Alpaca API error placing exit for {symbol}: {e}")
+    except Exception as e:
+        _log(f"⚠️ Unexpected error placing exit for {symbol}: {e}")
+    return False
+
+
+def _submit_bracket(
+    api: REST,
+    symbol: str,
+    last_price: float,
+    qty: int,
+    strategy: Optional[str],
+    trail_override: Optional[float] = None,
+) -> bool:
     """
     Place a market buy, then a separate trailing-stop sell to let spikes run.
     Using two orders avoids Alpaca OTO validation on missing stop_price.
     """
-    trail_pct = TRAIL_STOP_PCT
+    trail_pct = trail_override if trail_override is not None else TRAIL_STOP_PCT
     try:
         limit_price = round(last_price * (1 + ENTRY_SLIPPAGE_PCT / 100), 2)
         api.submit_order(
@@ -171,18 +238,12 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
         )
         _log(
             f"🟢 Limit buy {symbol} qty={qty} @<= {limit_price} (last={last_price}) "
-            f"with trailing exit {trail_pct}%"
+            f"with exit mode={STOP_EXIT_MODE}"
         )
 
-        # Submit a separate trailing-stop sell so profits can run.
-        api.submit_order(
-            symbol=symbol,
-            side="sell",
-            type="trailing_stop",
-            qty=qty,
-            trail_percent=trail_pct,
-            time_in_force="gtc",
-        )
+        # Submit a separate exit order so profits can run.
+        if not _submit_exit_order(api, symbol, "sell", qty, last_price, trail_override=trail_pct):
+            return False
         trade_logger.append_event(
             {
                 "event": "entry_submitted",
@@ -203,7 +264,12 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
     return False
 
 
-def _attach_exit_orders(api: REST, positions: List, open_order_symbols: List[str]) -> None:
+def _attach_exit_orders(
+    api: REST,
+    positions: List,
+    open_order_symbols: List[str],
+    trail_override: Optional[float] = None,
+) -> None:
     """
     For any existing position lacking an open order, attach a trailing-stop exit
     so legacy holdings get protection even if the bot did not open them.
@@ -225,27 +291,24 @@ def _attach_exit_orders(api: REST, positions: List, open_order_symbols: List[str
             continue
 
         side = "sell" if float(getattr(pos, "qty", 0)) >= 0 else "buy"
-        trail_pct = TRAIL_STOP_PCT
+        ref_price = None
+        try:
+            ref_price = float(getattr(pos, "current_price", getattr(pos, "current_price", 0)))
+        except Exception:
+            ref_price = None
 
         try:
-            api.submit_order(
-                symbol=sym,
-                side=side,
-                type="trailing_stop",
-                qty=qty,
-                trail_percent=trail_pct,
-                time_in_force="gtc",
-            )
-            ATTACHED_EXITS.add(sym)
-            _log(f"🛡️ Attached trailing stop for existing position {sym} qty={qty} trail={trail_pct}%")
-            trade_logger.append_event(
-                {
-                    "event": "exit_attached",
-                    "symbol": sym,
-                    "qty": qty,
-                    "trail_percent": trail_pct,
-                }
-            )
+            if _submit_exit_order(api, sym, side, qty, ref_price, trail_override=trail_override):
+                ATTACHED_EXITS.add(sym)
+                trade_logger.append_event(
+                    {
+                        "event": "exit_attached",
+                        "symbol": sym,
+                        "qty": qty,
+                        "trail_percent": TRAIL_STOP_PCT if STOP_EXIT_MODE == "trailing" else None,
+                        "stop_limit_pct": STOP_LIMIT_PCT if STOP_EXIT_MODE == "stop_limit" else None,
+                    }
+                )
         except APIError as e:
             _log(f"⚠️ Alpaca API error attaching exit for {sym}: {e}")
         except Exception as e:
@@ -295,6 +358,94 @@ def _market_ready(api: REST) -> bool:
         return True
 
 
+def _log_order_updates(api: REST) -> None:
+    """Detect order status transitions and write them to the log/event file."""
+    global ORDER_STATUS_CACHE
+    try:
+        orders = api.list_orders(status="all", limit=100)
+    except Exception as e:
+        _log(f"⚠️ Could not list orders for status logging: {e}")
+        return
+
+    for o in orders:
+        oid = getattr(o, "id", None) or getattr(o, "order_id", None)
+        status = getattr(o, "status", None)
+        if not oid or not status:
+            continue
+
+        prev = ORDER_STATUS_CACHE.get(oid)
+        if prev == status:
+            continue
+        ORDER_STATUS_CACHE[oid] = status
+
+        if status.lower() in {"filled", "canceled", "rejected", "expired", "stopped"}:
+            payload = {
+                "event": "order_update",
+                "order_id": oid,
+                "symbol": getattr(o, "symbol", None),
+                "side": getattr(o, "side", None),
+                "status": status,
+                "type": getattr(o, "type", None),
+                "qty": getattr(o, "qty", None) or getattr(o, "filled_qty", None),
+                "filled_avg_price": getattr(o, "filled_avg_price", None),
+                "stop_price": getattr(o, "stop_price", None),
+                "limit_price": getattr(o, "limit_price", None),
+                "trail_percent": getattr(o, "trail_percent", None),
+            }
+            trade_logger.append_event(payload)
+            _log(f"ℹ️ Exit update: {payload}")
+
+
+def _holiday_guard_state(api: REST) -> Tuple[bool, bool]:
+    """
+    Return (skip_new_entries, tighten_exits) based on time to close/next open.
+    - skip_new_entries: pause new buys near close or during long closures.
+    - tighten_exits: request tighter exits pre-close/holiday.
+    """
+    if not HOLIDAY_GUARD_ENABLED:
+        return False, False
+
+    try:
+        clock = api.get_clock()
+        now = datetime.now(timezone.utc)
+        next_open = getattr(clock, "next_open", None)
+        next_close = getattr(clock, "next_close", None)
+
+        minutes_to_close = None
+        if getattr(clock, "is_open", False) and next_close:
+            close_dt = datetime.fromisoformat(str(next_close)).astimezone(timezone.utc)
+            minutes_to_close = max(0, (close_dt - now).total_seconds() / 60)
+
+        long_gap = False
+        if next_open:
+            open_dt = datetime.fromisoformat(str(next_open)).astimezone(timezone.utc)
+            hours_to_open = (open_dt - now).total_seconds() / 3600
+            long_gap = hours_to_open >= HOLIDAY_LONG_CLOSE_HOURS
+
+        skip_entries = False
+        tighten_exits = False
+
+        if minutes_to_close is not None and minutes_to_close <= HOLIDAY_SKIP_ENTRY_MINUTES:
+            skip_entries = True
+        if minutes_to_close is not None and minutes_to_close <= HOLIDAY_TIGHTEN_MINUTES:
+            tighten_exits = True
+
+        if long_gap:
+            skip_entries = True
+            tighten_exits = True
+
+        if skip_entries or tighten_exits:
+            _log(
+                f"🎌 Holiday/close guard active | skip_entries={skip_entries} "
+                f"tighten_exits={tighten_exits} "
+                f"minutes_to_close={minutes_to_close} long_gap={long_gap}"
+            )
+        return skip_entries, tighten_exits
+    except Exception as e:
+        _log(f"⚠️ Holiday guard check failed: {e}")
+        return False, False
+
+
 def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> None:
     """Blocking trading loop; meant to run inside a daemon thread."""
     api = _init_api(api_key, api_secret, base_url)
@@ -323,18 +474,26 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
                 continue
 
             equity, positions, open_orders, position_objs = _current_state(api)
+            _log_order_updates(api)
+            skip_entries, tighten_exits = _holiday_guard_state(api)
+            trail_guard = HOLIDAY_TIGHTEN_TRAIL_PCT if tighten_exits and STOP_EXIT_MODE == "trailing" else None
 
             # Always try to attach exits even if we're waiting for market open.
             try:
                 to_remove = set(ATTACHED_EXITS) - set(positions)
                 for sym in to_remove:
                     ATTACHED_EXITS.discard(sym)
-                _attach_exit_orders(api, position_objs, open_orders)
+                _attach_exit_orders(api, position_objs, open_orders, trail_override=trail_guard)
             except Exception as e:
                 _log(f"⚠️ Exit attachment step failed: {e}")
 
             if not _market_ready(api):
                 _log(f"⏸ Waiting for market + {MINUTES_AFTER_OPEN}m post-open window before entries.")
+                time.sleep(TRADE_POLL_SEC)
+                continue
+
+            if skip_entries:
+                _log("⏸ Holiday/close guard: skipping new entries this cycle.")
                 time.sleep(TRADE_POLL_SEC)
                 continue
 
@@ -360,7 +519,7 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
                     _log(f"⚠️ Skipping {sym}: could not size position (price={price}, equity={equity}).")
                     continue
 
-                if _submit_bracket(api, sym, price, qty, row.get("strategy")):
+                if _submit_bracket(api, sym, price, qty, row.get("strategy"), trail_override=trail_guard):
                     placed += 1
 
             if placed == 0:
