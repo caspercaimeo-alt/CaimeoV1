@@ -71,11 +71,11 @@ def _read_logs() -> List[str]:
 # ------------------------------------------------------------
 app = FastAPI(title="CAIMEO Server")
 
-# ✅ Fully permissive CORS (handles localhost, IP, 127.0.0.1)
+# ✅ Fully permissive CORS (public frontend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://localhost(:\d+)?|http://127\.0\.0\.1(:\d+)?",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
