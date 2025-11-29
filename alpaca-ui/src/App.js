@@ -373,13 +373,13 @@ function App() {
     },
     headerRow: {
       position: "relative",
-      display: "flex",
+      display: "grid",
+      gridTemplateColumns: isMobile ? "1fr auto 1fr" : "1fr",
       alignItems: "center",
-      justifyContent: "center",
+      justifyItems: "center",
       width: "100%",
       maxWidth: "1080px",
-      paddingRight: isMobile ? "48px" : 0,
-      paddingLeft: isMobile ? "48px" : 0,
+      padding: isMobile ? "0 18px" : "0",
     },
     titleMenu: {
       position: "relative",
@@ -387,7 +387,6 @@ function App() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      flex: isMobile ? 1 : 0,
       width: isMobile ? "100%" : "auto",
     },
     title: {
@@ -397,7 +396,6 @@ function App() {
       color: "#FCFBF4",
       textAlign: "center",
       margin: 0,
-      flex: isMobile ? 1 : 0,
       cursor: isMobile ? "default" : "pointer",
     },
     navToggle: {
@@ -551,8 +549,8 @@ function App() {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      gap: isMobile ? "12px" : "24px",
-      flexWrap: isMobile ? "wrap" : "nowrap",
+      gap: isMobile ? "10px" : "24px",
+      flexWrap: "nowrap",
       width: "100%",
     },
     sectionHeaderDiv: {
@@ -827,7 +825,7 @@ function App() {
 
   const controlButtonStyle = {
     ...styles.authButton,
-    width: isMobile ? "45%" : "auto",
+    width: isMobile ? "44%" : "auto",
     marginRight: isMobile ? "0" : "32px",
     marginLeft: "0",
     display: "inline-block",
@@ -922,7 +920,10 @@ function App() {
         >
           <div style={styles.headerRow}>
             <div
-              style={styles.titleMenu}
+              style={{
+                ...styles.titleMenu,
+                gridColumn: isMobile ? "2 / 3" : "1 / 2",
+              }}
               onMouseEnter={openNavDesktop}
               onMouseLeave={closeNavDesktop}
             >
@@ -954,7 +955,7 @@ function App() {
               type="button"
               aria-label="Toggle navigation"
               aria-expanded={navOpen}
-              style={styles.navToggle}
+              style={{ ...styles.navToggle, gridColumn: isMobile ? "3 / 4" : "1 / 2" }}
               onClick={toggleNav}
             >
               <span
