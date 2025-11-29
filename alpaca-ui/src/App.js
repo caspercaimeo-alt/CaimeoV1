@@ -379,6 +379,7 @@ function App() {
       width: "100%",
       maxWidth: "1080px",
       paddingRight: isMobile ? "48px" : 0,
+      paddingLeft: isMobile ? "48px" : 0,
     },
     titleMenu: {
       position: "relative",
@@ -667,8 +668,8 @@ function App() {
     stockPrice: {
       fontSize: isMobile ? "15px" : "18px",
       fontWeight: "bold",
-      marginTop: isMobile ? "-2px" : "0",
-      marginBottom: isMobile ? "2px" : "8px",
+      marginTop: isMobile ? "6px" : "0",
+      marginBottom: isMobile ? "3px" : "8px",
       width: "100%",
       textAlign: "center",
     },
