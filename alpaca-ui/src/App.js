@@ -1,7 +1,26 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 
-const SERVER = process.env.REACT_APP_SERVER_URL || "";
+const resolveServerUrl = () => {
+  const prodUrl = "https://api.caspercaimeo.com";
+  const localUrl = "http://localhost:5000";
+
+  if (process.env.REACT_APP_SERVER_URL) return process.env.REACT_APP_SERVER_URL;
+
+  if (typeof window === "undefined") return prodUrl;
+  if (window.__CAIMEO_API_BASE__) return window.__CAIMEO_API_BASE__;
+
+  const host = window.location.hostname || "";
+  const isLocal = host === "localhost" || host === "127.0.0.1";
+  if (isLocal) return localUrl;
+
+  const isProductionHost = host.endsWith("caspercaimeo.com") || host.endsWith("caimeov1.pages.dev");
+  if (isProductionHost) return prodUrl;
+
+  return prodUrl;
+};
+
+const SERVER = resolveServerUrl();
 
 function App() {
   const [logs, setLogs] = useState("");
@@ -27,7 +46,9 @@ function App() {
     status: "Idle",
   });
   const [navOpen, setNavOpen] = useState(false);
+  const [titleWidth, setTitleWidth] = useState(0);
   const logsBoxRef = useRef(null);
+  const titleRef = useRef(null);
   const [isMobile, setIsMobile] = useState(() => (typeof window === "undefined" ? false : window.innerWidth <= 768));
 
   const noCacheHeaders = {
@@ -61,7 +82,7 @@ function App() {
   }
 
   const computeCardsToShow = (width) => {
-    if (width <= 540) return 9;
+    if (width <= 768) return 9;
     const columns = Math.min(6, Math.max(1, Math.floor((width - 60) / 220)));
     return columns * 4;
   };
@@ -220,6 +241,9 @@ function App() {
       const width = window.innerWidth;
       setCardsToShow(computeCardsToShow(width));
       setIsMobile(width <= 768);
+      if (titleRef.current) {
+        setTitleWidth(titleRef.current.getBoundingClientRect().width);
+      }
     };
     updateResponsiveState();
     window.addEventListener("resize", updateResponsiveState);
@@ -233,6 +257,29 @@ function App() {
       clearInterval(statusInterval);
       window.removeEventListener("resize", updateResponsiveState);
     };
+  }, []);
+
+  useEffect(() => {
+    if (!isMobile) {
+      closeNav();
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (titleRef.current) {
+      setTitleWidth(titleRef.current.getBoundingClientRect().width);
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        closeNav();
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
   useEffect(() => {
@@ -300,6 +347,39 @@ function App() {
     { label: "Portfolio", href: "#portfolio-section" },
   ];
 
+  const toggleNav = () => setNavOpen((prev) => !prev);
+  const closeNav = () => setNavOpen(false);
+  const openNavDesktop = () => {
+    if (!isMobile) setNavOpen(true);
+  };
+  const closeNavDesktop = () => {
+    if (!isMobile) setNavOpen(false);
+  };
+
+  const sharedCardWidth = isMobile ? "95%" : "50%";
+  const sharedCardMargin = isMobile ? "0 auto 24px" : "40px auto 80px";
+  // Shared desktop sizing for the status and live feed cards to keep heights aligned
+  const desktopCardHeight = "418px";
+  const desktopCardBodyHeight = "326px";
+  const desktopHeaderHeight = "92px";
+  const sharedCardShell = {
+    backgroundColor: "#FCFBF4",
+    border: "4px solid #462323",
+    borderRadius: isMobile ? "18px" : "10px",
+    padding: 0,
+    width: sharedCardWidth,
+    textAlign: "center",
+    color: "#462323",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
+    boxSizing: "border-box",
+    height: isMobile ? "auto" : desktopCardHeight,
+    minHeight: isMobile ? "auto" : desktopCardHeight,
+    maxHeight: isMobile ? "none" : desktopCardHeight,
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
+  };
+
   const styles = {
     page: {
       backgroundColor: "#483c3bd5",
@@ -321,49 +401,73 @@ function App() {
       borderBottom: "5px solid #FCFBF4",
       borderRadius: "0px",
       width: "100%",
-      height: "50px",
+      height: isMobile ? "64px" : "58px",
       margin: "0",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      padding: "2px 10px",
-      position: "relative",
+      padding: isMobile ? "6px 14px" : "2px 10px",
+      position: "sticky",
+      top: 0,
       boxShadow: "0 6px 12px rgba(0,0,0,0.25)",
       gap: "2px",
+      zIndex: 40,
+    },
+    headerRow: {
+      position: "relative",
+      display: "grid",
+      gridTemplateColumns: "1fr",
+      alignItems: "center",
+      justifyItems: "center",
+      width: "100%",
+      maxWidth: "1080px",
+      padding: isMobile ? "0 18px" : "0",
+    },
+    titleMenu: {
+      position: "relative",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      width: isMobile ? "100%" : "auto",
     },
     title: {
-      fontSize: "32px",
+      fontSize: isMobile ? "26px" : "32px",
       fontWeight: "900",
       letterSpacing: "1px",
       color: "#FCFBF4",
       textAlign: "center",
       margin: 0,
+      cursor: "pointer",
     },
     navLinksInline: {
       display: "none",
       flexDirection: "column",
       alignItems: "stretch",
+      justifyContent: "center",
       gap: "0",
       position: "absolute",
       left: "50%",
       transform: "translateX(-50%)",
-      top: "100%",
-      width: isMobile ? "140px" : "160px",
+      top: "calc(100% + 10px)",
+      width: titleWidth ? `${titleWidth}px` : "160px",
+      minWidth: titleWidth ? `${titleWidth}px` : "160px",
+      maxWidth: titleWidth ? `${titleWidth}px` : "160px",
       backgroundColor: "#FCFBF4",
       border: "2px solid #462323",
-      borderRadius: "0 0 10px 10px",
+      borderRadius: "12px",
       overflow: "hidden",
       boxShadow: "0 8px 16px rgba(0,0,0,0.25)",
       pointerEvents: "auto",
-      zIndex: 25,
+      zIndex: 45,
     },
     navLinkInline: {
       color: "#462323",
       textDecoration: "none",
-      fontSize: "12px",
+      fontSize: "14px",
       fontWeight: "700",
-      padding: "8px 10px",
+      padding: "12px 14px",
       borderBottom: "1px solid #462323",
       backgroundColor: "#FCFBF4",
       textAlign: "center",
@@ -436,35 +540,24 @@ function App() {
       display: isMobile ? "block" : "inline-block",
     },
     statusBox: {
-      backgroundColor: "#FCFBF4",
-      border: "4px solid #462323",
-      borderRadius: "18px",
-      padding: 0,
-      width: isMobile ? "95%" : "50%",
-      margin: isMobile ? "0 auto 24px" : "40px auto 80px",
-      textAlign: "center",
-      color: "#462323",
-      boxShadow: "0 6px 18px rgba(0,0,0,0.2)",
-      minHeight: isMobile ? "auto" : "320px",
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
+      ...sharedCardShell,
+      margin: sharedCardMargin,
     },
     statusContent: {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      padding: isMobile ? "18px 24px 24px" : "24px 30px 30px",
+      padding: isMobile ? "12px 20px 18px" : "24px 30px 30px",
       width: "100%",
       boxSizing: "border-box",
-      gap: "14px",
+      gap: isMobile ? "10px" : "14px",
     },
     statusButtonRow: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      gap: isMobile ? "12px" : "24px",
-      flexWrap: isMobile ? "wrap" : "nowrap",
+      gap: isMobile ? "10px" : "24px",
+      flexWrap: "nowrap",
       width: "100%",
     },
     sectionHeaderDiv: {
@@ -511,9 +604,13 @@ function App() {
       border: "none",
       borderRadius: "0px",
       width: "100%",
-      margin: isMobile ? "-20px auto 15px" : "0 auto 20px",
+      maxWidth: isMobile ? "420px" : "100%",
+      margin: isMobile ? "-12px auto 18px" : "0 auto 20px",
       padding: isMobile ? "10px 4% 20px 4%" : "30px 0 30px",
       boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
     },
     portfolioWrapper: {
       backgroundColor: "transparent",
@@ -528,13 +625,15 @@ function App() {
       ? {
           display: "grid",
           gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-          gap: "12px",
+          gap: "10px",
           width: "100%",
-          maxWidth: "100%",
+          maxWidth: "360px",
           margin: "0 auto",
           boxSizing: "border-box",
-          padding: "0 12px",
-          justifyItems: "stretch",
+          padding: "0 8px",
+          justifyItems: "center",
+          alignItems: "stretch",
+          gridAutoRows: "1fr",
         }
       : {
           display: "grid",
@@ -564,78 +663,116 @@ function App() {
       backgroundColor: "#462323",
       color: "#FCFBF4",
       borderRadius: "6px",
-      padding: "5px 0",
-      marginBottom: "8px",
+      padding: isMobile ? "4px 0" : "5px 0",
+      marginBottom: isMobile ? "0" : "8px",
       fontWeight: "bold",
-      fontSize: isMobile ? "16px" : "22px",
+      fontSize: isMobile ? "15px" : "22px",
+      width: "100%",
+      textAlign: "center",
     },
     stockPrice: {
-      fontSize: isMobile ? "16px" : "18px",
+      fontSize: isMobile ? "15px" : "18px",
       fontWeight: "bold",
-      marginBottom: "8px",
+      marginTop: isMobile ? "6px" : "0",
+      marginBottom: isMobile ? "3px" : "8px",
+      width: "100%",
+      textAlign: "center",
     },
     metricTable: {
-      width: "100%",
+      width: isMobile ? "88%" : "100%",
       borderCollapse: "collapse",
-      marginTop: "8px",
+      marginTop: isMobile ? "2px" : "8px",
+      marginLeft: "auto",
+      marginRight: "auto",
+      tableLayout: "fixed",
+      alignSelf: "center",
     },
     metricName: {
       textAlign: "left",
-      fontWeight: "600",
+      fontWeight: "700",
       color: "#462323",
-      padding: isMobile ? "2px" : "4px",
+      padding: isMobile ? "1px 2px 0" : "4px",
       borderBottom: "1px solid #462323",
-      fontSize: isMobile ? "12px" : undefined,
+      fontSize: isMobile ? "10.5px" : undefined,
+      lineHeight: isMobile ? "1.15" : undefined,
+      width: "56%",
+      verticalAlign: "middle",
+      whiteSpace: "nowrap",
     },
     metricValue: {
       textAlign: "right",
-      padding: isMobile ? "2px" : "4px",
+      padding: isMobile ? "1px 2px 0" : "4px",
       borderBottom: "1px solid #462323",
-      fontSize: isMobile ? "12px" : undefined,
+      fontSize: isMobile ? "10.5px" : undefined,
+      lineHeight: isMobile ? "1.15" : undefined,
+      whiteSpace: "nowrap",
+      width: "44%",
+      verticalAlign: "middle",
+    },
+    metricValueContent: {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      gap: isMobile ? "1px" : "4px",
     },
     confidenceBadge: (color) => ({
-      display: "inline-block",
-      marginTop: "12px",
-      padding: isMobile ? "2px 6px" : "4px 8px",
-      borderRadius: "8px",
-      fontSize: isMobile ? "12px" : "13px",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      alignSelf: "center",
+      margin: isMobile ? "12px auto 0" : "12px auto 0",
+      padding: isMobile ? "1px 4px" : "3px 7px",
+      borderRadius: "6px",
+      fontSize: isMobile ? "6.5px" : "12px",
       fontWeight: "bold",
       backgroundColor: color,
       color: "#FCFBF4",
       border: "1px solid #462323",
+      textAlign: "center",
+      width: "fit-content",
     }),
+    stockCardInner: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      width: "100%",
+      gap: isMobile ? "1px" : "4px",
+    },
     strategyTag: () => ({
       display: "block",
-      marginTop: "10px",
-      padding: isMobile ? "2px 4px" : "3px 6px",
+      marginTop: isMobile ? "8px" : "10px",
+      padding: isMobile ? "1px 4px" : "3px 6px",
       borderRadius: "6px",
-      fontSize: isMobile ? "11px" : "13px",
-      fontWeight: "800",
+      fontSize: isMobile ? "10px" : "13px",
+      fontWeight: "700",
       backgroundColor: "#FCFBF4",
       color: "#462323",
       border: "1px solid #FCFBF4",
+      textAlign: "center",
     }),
     liveFeedBox: {
       backgroundColor: "#FCFBF4",
-      border: "4px solid #462323",
-      borderRadius: isMobile ? "18px" : "10px",
+      border: "0",
+      borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
       width: "100%",
       margin: "0 auto",
       color: "#462323",
       padding: isMobile ? "18px 22px" : "16px 18px",
-      maxHeight: isMobile ? "340px" : "320px",
-      minHeight: isMobile ? "220px" : "320px",
+      boxSizing: "border-box",
+      height: isMobile ? "auto" : desktopCardBodyHeight,
+      maxHeight: isMobile ? "340px" : desktopCardBodyHeight,
+      minHeight: isMobile ? "220px" : desktopCardBodyHeight,
       overflowY: "auto",
       fontFamily: "monospace",
       lineHeight: 1.4,
       whiteSpace: "pre-wrap",
       wordBreak: "break-word",
-      boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
-      boxSizing: "border-box",
+      boxShadow: "none",
+      flex: 1,
     },
     tradeButton: {
       padding: isMobile ? "8px 18px" : "10px 24px",
-      marginTop: "10px",
+      marginTop: isMobile ? "6px" : "10px",
       border: "3px solid #462323",
       borderRadius: "8px",
       backgroundColor: "#FCFBF4",
@@ -643,7 +780,7 @@ function App() {
       fontWeight: "700",
       fontSize: isMobile ? "14px" : "16px",
       cursor: "pointer",
-      marginRight: "8px",
+      marginRight: 0,
     },
   };
 
@@ -657,7 +794,6 @@ function App() {
       .table-wrap { width: 100% !important; }
       .table-wrap table { min-width: auto !important; }
       .section-header { width: 100% !important; font-size: 24px !important; }
-      .nav-links-inline { left: 50% !important; transform: translateX(-50%) !important; width: min(160px, 50%) !important; position: absolute !important; top: 48px !important; z-index: 30 !important; }
       .portfolio-wrapper .table-wrap { padding: 0 !important; margin: 0 !important; }
       .portfolio-wrapper table { width: 100% !important; }
     }
@@ -665,7 +801,7 @@ function App() {
     @media (max-width: 540px) {
       .title { font-size: 26px !important; }
       .section-header { font-size: 20px !important; }
-      .discovery-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; }
+      .discovery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; }
       .live-feed-box { max-height: 260px !important; }
     }
   `;
@@ -698,7 +834,7 @@ function App() {
 
   const controlButtonStyle = {
     ...styles.authButton,
-    width: isMobile ? "45%" : "auto",
+    width: isMobile ? "44%" : "auto",
     marginRight: isMobile ? "0" : "32px",
     marginLeft: "0",
     display: "inline-block",
@@ -709,43 +845,133 @@ function App() {
         backgroundColor: "#462323",
         color: "#FCFBF4",
         marginTop: "-4px",
-        padding: "20px 22px",
+        padding: "26px 22px",
         borderRadius: "18px 18px 0 0",
         fontWeight: "900",
         fontSize: "28px",
         borderBottom: "4px solid #FCFBF4",
         boxSizing: "border-box",
-        minHeight: "80px",
+        minHeight: "96px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        width: "calc(100% + 78px)",
-        marginLeft: "0px",
-        marginRight: "-78px",
+        width: "100%",
       }
     : {
         backgroundColor: "#462323",
         color: "#FCFBF4",
         marginTop: "-4px",
-        padding: "12px 18px",
+        padding: "16px 18px",
         borderRadius: "10px 10px 0 0",
         fontWeight: "900",
         fontSize: "32px",
         borderBottom: "4px solid #FCFBF4",
         boxSizing: "border-box",
+        minHeight: "78px",
+        width: "100%",
       };
 
+  const statusHeaderBarStyle = isMobile
+    ? {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        marginTop: "-4px",
+        padding: "22px 22px",
+        borderRadius: "18px 18px 0 0",
+        fontWeight: "900",
+        fontSize: "30px",
+        borderBottom: "4px solid #FCFBF4",
+        boxSizing: "border-box",
+        width: "100%",
+        textAlign: "center",
+        minHeight: "88px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }
+    : {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        marginTop: "-4px",
+        padding: "16px 18px",
+        borderRadius: "10px 10px 0 0",
+        fontWeight: "900",
+        fontSize: "32px",
+        borderBottom: "4px solid #FCFBF4",
+        boxSizing: "border-box",
+        width: "100%",
+        textAlign: "center",
+        minHeight: desktopHeaderHeight,
+        height: desktopHeaderHeight,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      };
+
+  const statusBodyStyle = {
+    backgroundColor: "#FCFBF4",
+    borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
+    display: "flex",
+    flexDirection: "column",
+    flex: 1,
+    boxSizing: "border-box",
+    height: isMobile ? "auto" : desktopCardBodyHeight,
+    minHeight: isMobile ? "auto" : desktopCardBodyHeight,
+    maxHeight: isMobile ? "none" : desktopCardBodyHeight,
+  };
+
   const liveFeedCardStyle = {
-    width: isMobile ? "100%" : "50%",
+    width: sharedCardWidth,
     display: "flex",
     flexDirection: "column",
     justifyContent: "stretch",
     alignItems: "center",
-    marginTop: isMobile ? "260px" : "0px",
+    margin: sharedCardMargin,
   };
 
-  const liveFeedWidth = isMobile ? "85%" : "82%";
+  const liveFeedWidth = "100%";
+
+  const liveFeedShellStyle = {
+    ...sharedCardShell,
+    width: liveFeedWidth,
+    margin: "0 auto",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+  };
+
+  const liveFeedHeaderStyle = isMobile
+    ? {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        padding: "24px 18px",
+        borderBottom: "4px solid #FCFBF4",
+        borderRadius: "18px 18px 0 0",
+        textAlign: "center",
+        fontWeight: "900",
+        fontSize: "32px",
+        marginTop: "-4px",
+        minHeight: "92px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }
+    : {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        padding: "16px 14px",
+        borderBottom: "4px solid #FCFBF4",
+        borderRadius: "10px 10px 0 0",
+        textAlign: "center",
+        fontWeight: "900",
+        fontSize: "30px",
+        marginTop: "-4px",
+        boxSizing: "border-box",
+        minHeight: desktopHeaderHeight,
+        height: desktopHeaderHeight,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      };
 
   return (
     <div style={styles.page}>
@@ -756,29 +982,46 @@ function App() {
             ...styles.headerBox,
             margin: "0 auto",
           }}
-          onMouseEnter={() => setNavOpen(true)}
-          onMouseLeave={() => setNavOpen(false)}
         >
-          <h1 style={styles.title} className="title">
-            CAIMEO
-          </h1>
-          <div
-            className="nav-links-inline"
-            style={{
-              ...styles.navLinksInline,
-              display: navOpen ? "flex" : "none",
-            }}
-            onMouseEnter={() => setNavOpen(true)}
-            onMouseLeave={() => setNavOpen(false)}
-          >
-            {navItems.map((item) => (
-              <a key={item.href} href={item.href} style={styles.navLinkInline}>
-                {item.label}
-              </a>
-            ))}
+          <div style={styles.headerRow}>
+            <div
+              style={{
+                ...styles.titleMenu,
+              }}
+              onMouseEnter={openNavDesktop}
+              onMouseLeave={closeNavDesktop}
+              onClick={() => {
+                if (isMobile) toggleNav();
+              }}
+            >
+              <h1 style={styles.title} className="title" ref={titleRef}>
+                CAIMEO
+              </h1>
+              <div
+                className="nav-links-inline"
+                style={{
+                  ...styles.navLinksInline,
+                  display: navOpen ? "flex" : "none",
+                }}
+                onMouseEnter={openNavDesktop}
+                onMouseLeave={closeNavDesktop}
+              >
+                {navItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    style={styles.navLinkInline}
+                    onClick={closeNav}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      {navOpen && isMobile ? <div className="nav-overlay" onClick={closeNav} /> : null}
 
       <div id="auth-section" style={styles.authWrapper} className="auth-wrapper">
         <div style={styles.authBox} className="auth-box">
@@ -824,70 +1067,59 @@ function App() {
 
         <div className="status-live-row" style={statusLiveRowStyle}>
           <div id="status-section" style={styles.statusBox} className="status-card">
-            <div style={{ ...styles.statusContent }}>
-              <div style={{ ...authHeaderBarStyle, marginTop: "-4px" }}>
-                <h3 style={{ margin: 0, fontSize: isMobile ? "32px" : "38px" }}>Bot Status</h3>
-              </div>
-              <div
-                style={{
-                  display: "inline-block",
-                  marginTop: isMobile ? "18px" : "36px",
-                  padding: "13px 26px",
-                  borderRadius: "999px",
-                  backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
-                  color: "#FCFBF4",
-                  fontWeight: "900",
-                  fontSize: isMobile ? "22px" : "18px",
-                  border: "2px solid #FCFBF4",
-                }}
-              >
-                {status}
-              </div>
-              <div style={styles.statusButtonRow}>
-                <button
+            <div style={statusHeaderBarStyle}>
+              <h3 style={{ margin: 0, fontSize: isMobile ? "30px" : "36px" }}>Bot Status</h3>
+            </div>
+            <div style={statusBodyStyle}>
+              <div style={{ ...styles.statusContent, paddingTop: isMobile ? "12px" : "20px" }}>
+                <div
                   style={{
-                    ...controlButtonStyle,
-                    opacity: authenticated ? 1 : 0.5,
-                    cursor: authenticated ? "pointer" : "not-allowed",
+                    display: "inline-block",
+                    marginTop: isMobile ? "2px" : "18px",
+                    padding: "13px 26px",
+                    borderRadius: "999px",
+                    backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
+                    color: "#FCFBF4",
+                    fontWeight: "900",
+                    fontSize: isMobile ? "22px" : "18px",
+                    border: "2px solid #FCFBF4",
                   }}
-                  disabled={!authenticated}
-                  onClick={() => handleControl("start")}
                 >
-                  Start
-                </button>
-                <button
-                  style={{ ...controlButtonStyle, marginRight: 0 }}
-                  onClick={() => handleControl("stop")}
-                >
-                  Stop
-                </button>
+                  {status}
+                </div>
+                <div style={styles.statusButtonRow}>
+                  <button
+                    style={{
+                      ...controlButtonStyle,
+                      opacity: authenticated ? 1 : 0.5,
+                      cursor: authenticated ? "pointer" : "not-allowed",
+                    }}
+                    disabled={!authenticated}
+                    onClick={() => handleControl("start")}
+                  >
+                    Start
+                  </button>
+                  <button
+                    style={{ ...controlButtonStyle, marginRight: 0 }}
+                    onClick={() => handleControl("stop")}
+                  >
+                    Stop
+                  </button>
+                </div>
+                <p style={{ fontSize: "18px", marginTop: "auto" }}>
+                  Authenticated:{" "}
+                  <span style={{ color: authenticated ? "green" : "red" }}>
+                    {authenticated ? "✅" : "❌"}
+                  </span>
+                </p>
               </div>
-              <p style={{ fontSize: "18px", marginTop: "auto" }}>
-                Authenticated:{" "}
-                <span style={{ color: authenticated ? "green" : "red" }}>
-                  {authenticated ? "✅" : "❌"}
-                </span>
-              </p>
             </div>
           </div>
 
           <div style={liveFeedCardStyle} className="live-feed-card" id="live-feed-section">
-            <div style={{ width: liveFeedWidth, margin: "0 auto" }}>
-              <div
-                style={{
-                  backgroundColor: "#462323",
-                  color: "#FCFBF4",
-                  border: "4px solid #462323",
-                  borderRadius: "18px 18px 0 0",
-                  width: "100%",
-                  textAlign: "center",
-                  padding: "12px 0",
-                  fontWeight: "bold",
-                  fontSize: "26px",
-                  boxSizing: "border-box",
-                }}
-              >
-                <h2 style={{ margin: 0, fontSize: "32px", lineHeight: "1.1" }}>Live Feed</h2>
+            <div style={liveFeedShellStyle}>
+              <div style={liveFeedHeaderStyle}>
+                <h2 style={{ margin: 0, fontSize: isMobile ? "32px" : "30px", lineHeight: "1.1" }}>Live Feed</h2>
               </div>
               <div className="live-feed-box" style={styles.liveFeedBox} ref={logsBoxRef}>
                 <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{logs}</pre>
@@ -943,17 +1175,17 @@ function App() {
             <p style={{ margin: "20px 0 0 0" }}>
               <strong>{progress.status}</strong> — {progress.percent.toFixed(1)}% ({progress.eta} remaining)
             </p>
-            <div
-              style={{
-                backgroundColor: "#837777ff",
-                width: isMobile ? "90%" : "93%",
-                height: isMobile ? "18px" : "25px",
-                borderRadius: "8px",
-                border: "2px solid #462323",
-                margin: "10px auto",
-                overflow: "hidden",
-              }}
-            >
+              <div
+                style={{
+                  backgroundColor: "#837777ff",
+                  width: isMobile ? "82%" : "86%",
+                  height: isMobile ? "12px" : "18px",
+                  borderRadius: "8px",
+                  border: "2px solid #462323",
+                  margin: "10px auto",
+                  overflow: "hidden",
+                }}
+              >
               <div
                 style={{
                   width: `${progress.percent}%`,
@@ -1005,7 +1237,7 @@ function App() {
                   style={isMobile ? undefined : styles.stockCard}
                   className="stock-card"
                 >
-                  <div>
+                  <div style={styles.stockCardInner}>
                     <div style={styles.stockTickerBox} className="stock-card__ticker">
                       {symbol}
                     </div>
@@ -1013,6 +1245,10 @@ function App() {
                       {price === null ? "N/A" : `$${price.toFixed(2)}`}
                     </p>
                     <table style={styles.metricTable}>
+                      <colgroup>
+                        <col style={{ width: "56%" }} />
+                        <col style={{ width: "44%" }} />
+                      </colgroup>
                       <tbody>
                         <tr>
                           <td style={styles.metricName}>EPS</td>
@@ -1023,8 +1259,10 @@ function App() {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {eps !== null ? `${eps.toFixed(1)}%` : "N/A"}
-                            <span style={{ marginLeft: "4px" }}>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
+                            <span style={styles.metricValueContent}>
+                              <span>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
+                              <span>{eps !== null ? `${eps.toFixed(1)}%` : "N/A"}</span>
+                            </span>
                           </td>
                         </tr>
                         <tr>
@@ -1036,8 +1274,10 @@ function App() {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {revenueChange !== null ? `${revenueChange.toFixed(1)}%` : "N/A"}
-                            <span style={{ marginLeft: "4px" }}>{revenueChange > 0 ? "▲" : revenueChange < 0 ? "▼" : ""}</span>
+                            <span style={styles.metricValueContent}>
+                              <span>{revenueChange > 0 ? "▲" : revenueChange < 0 ? "▼" : ""}</span>
+                              <span>{revenueChange !== null ? `${revenueChange.toFixed(1)}%` : "N/A"}</span>
+                            </span>
                           </td>
                         </tr>
                         <tr>
@@ -1049,8 +1289,10 @@ function App() {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {pe !== null ? `${pe.toFixed(1)}%` : "N/A"}
-                            <span style={{ marginLeft: "4px" }}>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
+                            <span style={styles.metricValueContent}>
+                              <span>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
+                              <span>{pe !== null ? `${pe.toFixed(1)}%` : "N/A"}</span>
+                            </span>
                           </td>
                         </tr>
                         <tr>
@@ -1062,8 +1304,10 @@ function App() {
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {growth !== null ? `${growth.toFixed(1)}%` : "N/A"}
-                            <span style={{ marginLeft: "4px" }}>{growth > 0 ? "▲" : growth < 0 ? "▼" : ""}</span>
+                            <span style={styles.metricValueContent}>
+                              <span>{growth > 0 ? "▲" : growth < 0 ? "▼" : ""}</span>
+                              <span>{growth !== null ? `${growth.toFixed(1)}%` : "N/A"}</span>
+                            </span>
                           </td>
                         </tr>
                       </tbody>
@@ -1075,50 +1319,73 @@ function App() {
               );
             })
           ) : (
-            <a
-              href="https://finance.yahoo.com/quote/CAIMEO"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={isMobile ? undefined : styles.stockCard}
-              className="stock-card"
+            <div
+              className="discovery-placeholder"
+              style={{ width: "100%", display: "flex", justifyContent: "center", gridColumn: "1 / -1" }}
             >
-              <div>
-                <div style={styles.stockTickerBox} className="stock-card__ticker">
-                  CAIMEO
+              <a
+                href="https://finance.yahoo.com/quote/CAIMEO"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={isMobile ? undefined : styles.stockCard}
+                className="stock-card"
+              >
+                <div style={styles.stockCardInner}>
+                  <div style={styles.stockTickerBox} className="stock-card__ticker">
+                    CAIMEO
+                  </div>
+                  <p style={styles.stockPrice} className="stock-card__price">
+                    $9.00
+                  </p>
+                  <table style={styles.metricTable}>
+                    <colgroup>
+                      <col style={{ width: "56%" }} />
+                      <col style={{ width: "44%" }} />
+                    </colgroup>
+                    <tbody>
+                      <tr>
+                        <td style={styles.metricName}>EPS</td>
+                        <td style={{ ...styles.metricValue, color: "green" }}>
+                          <span style={styles.metricValueContent}>
+                            <span style={{ color: "green" }}>▲</span>
+                            <span>2.0</span>
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={styles.metricName}>Revenue</td>
+                        <td style={{ ...styles.metricValue, color: "green" }}>
+                          <span style={styles.metricValueContent}>
+                            <span style={{ color: "green" }}>▲</span>
+                            <span>15%</span>
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style={styles.metricName}>P/E</td>
+                        <td style={{ ...styles.metricValue, color: "green" }}>
+                          <span style={styles.metricValueContent}>
+                            <span style={{ color: "green" }}>▲</span>
+                            <span>18.0</span>
+                          </span>
+                        </td>
+                      </tr>
+                        <tr>
+                          <td style={styles.metricName}>Growth</td>
+                          <td style={styles.metricValue}>
+                          <span style={styles.metricValueContent}>
+                            <span></span>
+                            <span>12%</span>
+                          </span>
+                        </td>
+                        </tr>
+                    </tbody>
+                  </table>
+                  <div style={styles.confidenceBadge("#3cb043")}>Confidence: A</div>
+                  <div style={styles.strategyTag("#3cb043")}>3-Day Momentum</div>
                 </div>
-                <p style={styles.stockPrice} className="stock-card__price">
-                  $9.00
-                </p>
-                <table style={styles.metricTable}>
-                  <tbody>
-                    <tr>
-                      <td style={styles.metricName}>EPS</td>
-                      <td style={{ ...styles.metricValue, color: "green" }}>
-                        2.0 <span style={{ color: "green" }}>▲</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={styles.metricName}>Revenue</td>
-                      <td style={{ ...styles.metricValue, color: "green" }}>
-                        15% <span style={{ color: "green" }}>▲</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={styles.metricName}>P/E</td>
-                      <td style={{ ...styles.metricValue, color: "green" }}>
-                        18.0 <span style={{ color: "green" }}>▲</span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={styles.metricName}>Growth</td>
-                      <td style={styles.metricValue}>12%</td>
-                    </tr>
-                  </tbody>
-                </table>
-                <div style={styles.confidenceBadge("#3cb043")}>Confidence: A</div>
-                <div style={styles.strategyTag("#3cb043")}>3-Day Momentum</div>
-              </div>
-            </a>
+              </a>
+            </div>
           )}
         </div>
       </div>
@@ -1156,7 +1423,16 @@ function App() {
                         ? fmtMoney(account.equity)
                         : "Authenticate to view equity"}
                     </div>
-                    <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: isMobile ? "10px" : "14px",
+                        flexWrap: "nowrap",
+                        marginTop: isMobile ? "4px" : "8px",
+                      }}
+                    >
                       <button style={styles.tradeButton} onClick={() => handleControl("start")}>
                         Start Live Trading
                       </button>
