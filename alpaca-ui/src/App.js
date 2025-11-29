@@ -374,7 +374,7 @@ function App() {
     headerRow: {
       position: "relative",
       display: "grid",
-      gridTemplateColumns: isMobile ? "1fr auto 1fr" : "1fr",
+      gridTemplateColumns: "1fr",
       alignItems: "center",
       justifyItems: "center",
       width: "100%",
@@ -396,32 +396,7 @@ function App() {
       color: "#FCFBF4",
       textAlign: "center",
       margin: 0,
-      cursor: isMobile ? "default" : "pointer",
-    },
-    navToggle: {
-      display: isMobile ? "inline-flex" : "none",
-      alignItems: "center",
-      justifyContent: "center",
-      width: "40px",
-      height: "40px",
-      borderRadius: "8px",
-      border: "2px solid #FCFBF4",
-      backgroundColor: "transparent",
-      color: "#FCFBF4",
       cursor: "pointer",
-      marginLeft: "12px",
-      position: isMobile ? "absolute" : "static",
-      right: isMobile ? "0" : undefined,
-      top: isMobile ? "50%" : undefined,
-      transform: isMobile ? "translateY(-50%)" : undefined,
-    },
-    navToggleBar: {
-      display: "block",
-      width: "18px",
-      height: "2px",
-      backgroundColor: "#FCFBF4",
-      margin: "3px 0",
-      transition: "transform 0.2s ease, opacity 0.2s ease",
     },
     navLinksInline: {
       display: "none",
@@ -975,10 +950,12 @@ function App() {
             <div
               style={{
                 ...styles.titleMenu,
-                gridColumn: isMobile ? "2 / 3" : "1 / 2",
               }}
               onMouseEnter={openNavDesktop}
               onMouseLeave={closeNavDesktop}
+              onClick={() => {
+                if (isMobile) toggleNav();
+              }}
             >
               <h1 style={styles.title} className="title" ref={titleRef}>
                 CAIMEO
@@ -1004,32 +981,6 @@ function App() {
                 ))}
               </div>
             </div>
-            <button
-              type="button"
-              aria-label="Toggle navigation"
-              aria-expanded={navOpen}
-              style={{ ...styles.navToggle, gridColumn: isMobile ? "3 / 4" : "1 / 2" }}
-              onClick={toggleNav}
-            >
-              <span
-                style={{
-                  ...styles.navToggleBar,
-                  transform: navOpen ? "translateY(5px) rotate(45deg)" : "none",
-                }}
-              />
-              <span
-                style={{
-                  ...styles.navToggleBar,
-                  opacity: navOpen ? 0 : 1,
-                }}
-              />
-              <span
-                style={{
-                  ...styles.navToggleBar,
-                  transform: navOpen ? "translateY(-5px) rotate(-45deg)" : "none",
-                }}
-              />
-            </button>
           </div>
         </div>
       </div>
