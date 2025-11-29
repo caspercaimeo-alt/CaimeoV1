@@ -745,8 +745,8 @@ function App() {
     }),
     liveFeedBox: {
       backgroundColor: "#FCFBF4",
-      border: "4px solid #462323",
-      borderRadius: isMobile ? "18px" : "10px",
+      border: "0",
+      borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
       width: "100%",
       margin: "0 auto",
       color: "#462323",
@@ -758,7 +758,7 @@ function App() {
       lineHeight: 1.4,
       whiteSpace: "pre-wrap",
       wordBreak: "break-word",
-      boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+      boxShadow: "none",
       boxSizing: "border-box",
     },
     tradeButton: {
@@ -867,7 +867,8 @@ function App() {
     ? {
         backgroundColor: "#462323",
         color: "#FCFBF4",
-        padding: "16px 22px",
+        marginTop: "-4px",
+        padding: "22px 22px",
         borderRadius: "18px 18px 0 0",
         fontWeight: "900",
         fontSize: "30px",
@@ -875,11 +876,16 @@ function App() {
         boxSizing: "border-box",
         width: "100%",
         textAlign: "center",
+        minHeight: "88px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }
     : {
         backgroundColor: "#462323",
         color: "#FCFBF4",
-        padding: "12px 18px",
+        marginTop: "-4px",
+        padding: "16px 18px",
         borderRadius: "10px 10px 0 0",
         fontWeight: "900",
         fontSize: "32px",
@@ -887,6 +893,10 @@ function App() {
         boxSizing: "border-box",
         width: "100%",
         textAlign: "center",
+        minHeight: "82px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       };
 
   const statusBodyStyle = {
@@ -907,6 +917,49 @@ function App() {
   };
 
   const liveFeedWidth = isMobile ? "85%" : "82%";
+
+  const liveFeedShellStyle = {
+    backgroundColor: "#FCFBF4",
+    border: "4px solid #462323",
+    borderRadius: isMobile ? "18px" : "10px",
+    overflow: "hidden",
+    width: liveFeedWidth,
+    margin: "0 auto",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+    boxSizing: "border-box",
+  };
+
+  const liveFeedHeaderStyle = isMobile
+    ? {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        padding: "24px 18px",
+        borderBottom: "4px solid #FCFBF4",
+        borderRadius: "18px 18px 0 0",
+        textAlign: "center",
+        fontWeight: "900",
+        fontSize: "32px",
+        marginTop: "-4px",
+        minHeight: "92px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }
+    : {
+        backgroundColor: "#462323",
+        color: "#FCFBF4",
+        padding: "16px 14px",
+        borderBottom: "4px solid #FCFBF4",
+        borderRadius: "10px 10px 0 0",
+        textAlign: "center",
+        fontWeight: "900",
+        fontSize: "30px",
+        marginTop: "-4px",
+        minHeight: "80px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      };
 
   return (
     <div style={styles.page}>
@@ -1076,22 +1129,9 @@ function App() {
           </div>
 
           <div style={liveFeedCardStyle} className="live-feed-card" id="live-feed-section">
-            <div style={{ width: liveFeedWidth, margin: "0 auto" }}>
-              <div
-                style={{
-                  backgroundColor: "#462323",
-                  color: "#FCFBF4",
-                  border: "4px solid #462323",
-                  borderRadius: "18px 18px 0 0",
-                  width: "100%",
-                  textAlign: "center",
-                  padding: "12px 0",
-                  fontWeight: "bold",
-                  fontSize: "26px",
-                  boxSizing: "border-box",
-                }}
-              >
-                <h2 style={{ margin: 0, fontSize: "32px", lineHeight: "1.1" }}>Live Feed</h2>
+            <div style={liveFeedShellStyle}>
+              <div style={liveFeedHeaderStyle}>
+                <h2 style={{ margin: 0, fontSize: isMobile ? "32px" : "30px", lineHeight: "1.1" }}>Live Feed</h2>
               </div>
               <div className="live-feed-box" style={styles.liveFeedBox} ref={logsBoxRef}>
                 <pre style={{ margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{logs}</pre>
