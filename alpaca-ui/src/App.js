@@ -883,7 +883,7 @@ function App() {
   };
 
   const liveFeedCardStyle = {
-    width: isMobile ? "100%" : "50%",
+    width: isMobile ? "95%" : "50%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "stretch",
@@ -891,7 +891,7 @@ function App() {
     marginTop: isMobile ? "24px" : "0px",
   };
 
-  const liveFeedWidth = isMobile ? "85%" : "82%";
+  const liveFeedWidth = isMobile ? "95%" : "100%";
 
   const liveFeedShellStyle = {
     backgroundColor: "#FCFBF4",
@@ -902,6 +902,7 @@ function App() {
     margin: "0 auto",
     boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
     boxSizing: "border-box",
+    minHeight: isMobile ? "auto" : "320px",
   };
 
   const liveFeedHeaderStyle = isMobile
@@ -1141,8 +1142,8 @@ function App() {
             <div
               style={{
                 backgroundColor: "#837777ff",
-                width: isMobile ? "90%" : "93%",
-                height: isMobile ? "18px" : "25px",
+                width: isMobile ? "88%" : "90%",
+                height: isMobile ? "15px" : "22px",
                 borderRadius: "8px",
                 border: "2px solid #462323",
                 margin: "10px auto",
