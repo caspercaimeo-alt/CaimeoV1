@@ -6,72 +6,96 @@ body {
 }
 
 /* Title */
-h1 {
-  text-align: center;
-  font-size: 500px;
-  color: white;
+/* Utility styles leveraged by inline-styled components */
+.stock-card {
+  display: block;
+  border: 4px solid #462323;
+  border-radius: 8px;
+  background-color: #fcfbf4;
+  color: #462323;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-/* Section headers */
-h2 {
-  text-align: center;
-  font-size: 60px;
-  color: white;
+.stock-card__ticker {
+  font-weight: 900;
+  letter-spacing: 0.5px;
 }
 
-/* Paragraphs */
-p {
-  text-align: center;
+.stock-card__price {
+  font-weight: 700;
 }
 
-/* Buttons container (NEW) */
-.button-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-/* Buttons */
-button {
-  width: 160px;
-  height: 60px;
-  font-size: 24px;
-  border: 2px solid white;
-  background-color: grey;
-  color: white;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: white;
-  color: black;
-}
-
-/* App structure */
-.App {
-  text-align: center;
-}
-
-/* Glowing pulse for active bot */
-.pulse-glow {
-  animation: pulse 1.5s infinite;
-  text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
-}
-
-/* Pulse animation */
-@keyframes pulse {
-  0% {
-    text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
+/* --- Mobile overrides for inline-styled components --- */
+@media (max-width: 540px) {
+  .status-live-row {
+    flex-direction: column !important;
+    gap: 24px !important;
+    padding: 0 12px !important;
+    width: 100% !important;
   }
-  50% {
-    text-shadow: 0 0 20px rgba(0, 255, 100, 1);
+
+  .status-card,
+  .live-feed-card {
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 0 auto !important;
   }
-  100% {
-    text-shadow: 0 0 10px rgba(0, 255, 100, 0.8);
+
+  .live-feed-card .live-feed-box {
+    min-height: 260px !important;
+    max-height: 360px !important;
+    width: 100% !important;
+  }
+
+  .discovery-wrapper,
+  .portfolio-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 30px !important;
+    padding: 0 0 30px !important;
+  }
+
+  .discovery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 0 10px !important;
+    justify-items: stretch !important;
+  }
+
+  .stock-card {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 10px 6px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    font-size: 0.85rem !important;
+  }
+
+  .stock-card table td,
+  .stock-card table th {
+    font-size: 12px !important;
+    padding: 2px !important;
+  }
+
+  .stock-card__ticker {
+    font-size: 14px !important;
+  }
+
+  .stock-card__price {
+    font-size: 14px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .table-wrap {
+    width: 100% !important;
+    margin: 20px auto !important;
+    overflow: visible !important;
+  }
+
+  .table-wrap table {
+    width: 100% !important;
   }
 }
