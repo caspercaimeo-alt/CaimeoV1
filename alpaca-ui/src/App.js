@@ -836,20 +836,18 @@ function App() {
         backgroundColor: "#462323",
         color: "#FCFBF4",
         marginTop: "-4px",
-        padding: "24px 22px",
+        padding: "26px 22px",
         borderRadius: "18px 18px 0 0",
         fontWeight: "900",
         fontSize: "28px",
         borderBottom: "4px solid #FCFBF4",
         boxSizing: "border-box",
-        minHeight: "92px",
+        minHeight: "96px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        width: "calc(100% + 78px)",
-        marginLeft: "0px",
-        marginRight: "-78px",
+        width: "100%",
       }
     : {
         backgroundColor: "#462323",
@@ -861,7 +859,8 @@ function App() {
         fontSize: "32px",
         borderBottom: "4px solid #FCFBF4",
         boxSizing: "border-box",
-        minHeight: "70px",
+        minHeight: "78px",
+        width: "100%",
       };
 
   const statusHeaderBarStyle = isMobile
