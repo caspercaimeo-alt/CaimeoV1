@@ -16,6 +16,7 @@ import time
 import threading
 import requests
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any, List
 
 from fastapi import FastAPI
@@ -29,6 +30,7 @@ import auto_trader      # auto trading loop
 # ------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parent
 DISCOVERY_FILE = os.getenv("DISCOVERY_OUTPUT", "discovered_full.json")
 BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 active_keys: Dict[str, str] = {}
@@ -494,22 +496,31 @@ async def discovered():
         symbols_data: List[dict] = []
         data: Any = None
 
-        files = ["discovered_symbols.json", "discovered_full.json"]
-        for i, file in enumerate(files):
-            if not (os.path.exists(file) and os.path.getsize(file) > 5):
+        def resolve_file(path_str: str) -> Path:
+            path = Path(path_str)
+            return path if path.is_absolute() else BASE_DIR / path
+
+        configured = os.getenv("DISCOVERED_FILE")
+        files = [configured, DISCOVERY_FILE, "discovered_symbols.json", "discovered_full.json", "discovered_previous.json"]
+        candidates = [f for f in files if f]
+
+        for i, file in enumerate(candidates):
+            path = resolve_file(file)
+            if not (path.exists() and path.stat().st_size > 5):
                 continue
 
-            with open(file, "r") as f:
+            with path.open("r") as f:
                 try:
                     candidate = json.load(f)
                 except json.JSONDecodeError:
-                    _log(f"⚠️ Skipping invalid JSON file: {file}")
+                    _log(f"⚠️ Skipping invalid JSON file: {path}")
                     continue
 
             extracted = extract_symbols(candidate)
-            if extracted or i == len(files) - 1:
+            if extracted or i == len(candidates) - 1:
                 data = candidate
                 symbols_data = extracted
+                _log(f"✅ Loaded discovery data from {path} ({len(symbols_data)} symbols)")
                 break
 
         if data is None:
