@@ -1215,6 +1215,7 @@ function App() {
                 prevQuarterPrice && prevQuarterPrice > 0
                   ? ((price - prevQuarterPrice) / prevQuarterPrice) * 100
                   : null;
+              const roundedGrowth = growth !== null ? Math.round(growth) : null;
 
               const confLetter = (item.confidence || "F").toUpperCase();
               const colorMap = { A: "#3cb043", B: "#7dc242", C: "#f0c93d", D: "#f28f3b", F: "#d94f4f" };
@@ -1260,8 +1261,8 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
                               <span>{eps !== null ? `${eps.toFixed(1)}%` : "N/A"}</span>
+                              <span>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
                         </tr>
@@ -1275,8 +1276,8 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{revenueChange > 0 ? "▲" : revenueChange < 0 ? "▼" : ""}</span>
                               <span>{revenueChange !== null ? `${revenueChange.toFixed(1)}%` : "N/A"}</span>
+                              <span>{revenueChange > 0 ? "▲" : revenueChange < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
                         </tr>
@@ -1290,8 +1291,8 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
                               <span>{pe !== null ? `${pe.toFixed(1)}%` : "N/A"}</span>
+                              <span>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
                         </tr>
@@ -1305,8 +1306,8 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
+                              <span>{roundedGrowth !== null ? `${roundedGrowth}%` : "N/A"}</span>
                               <span>{growth > 0 ? "▲" : growth < 0 ? "▼" : ""}</span>
-                              <span>{growth !== null ? `${growth.toFixed(1)}%` : "N/A"}</span>
                             </span>
                           </td>
                         </tr>
@@ -1347,8 +1348,8 @@ function App() {
                         <td style={styles.metricName}>EPS</td>
                         <td style={{ ...styles.metricValue, color: "green" }}>
                           <span style={styles.metricValueContent}>
-                            <span style={{ color: "green" }}>▲</span>
                             <span>2.0</span>
+                            <span style={{ color: "green" }}>▲</span>
                           </span>
                         </td>
                       </tr>
@@ -1356,8 +1357,8 @@ function App() {
                         <td style={styles.metricName}>Revenue</td>
                         <td style={{ ...styles.metricValue, color: "green" }}>
                           <span style={styles.metricValueContent}>
-                            <span style={{ color: "green" }}>▲</span>
                             <span>15%</span>
+                            <span style={{ color: "green" }}>▲</span>
                           </span>
                         </td>
                       </tr>
@@ -1365,8 +1366,8 @@ function App() {
                         <td style={styles.metricName}>P/E</td>
                         <td style={{ ...styles.metricValue, color: "green" }}>
                           <span style={styles.metricValueContent}>
-                            <span style={{ color: "green" }}>▲</span>
                             <span>18.0</span>
+                            <span style={{ color: "green" }}>▲</span>
                           </span>
                         </td>
                       </tr>
@@ -1374,8 +1375,8 @@ function App() {
                           <td style={styles.metricName}>Growth</td>
                           <td style={styles.metricValue}>
                           <span style={styles.metricValueContent}>
-                            <span></span>
                             <span>12%</span>
+                            <span></span>
                           </span>
                         </td>
                         </tr>
