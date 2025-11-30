@@ -1217,6 +1217,11 @@ function App() {
                   : null;
               const roundedGrowth = growth !== null ? Math.round(growth) : null;
 
+              const revenueDisplay =
+                revenueChange !== null
+                  ? `${(isMobile ? Math.round(revenueChange) : revenueChange.toFixed(1))}%`
+                  : "N/A";
+
               const confLetter = (item.confidence || "F").toUpperCase();
               const colorMap = { A: "#3cb043", B: "#7dc242", C: "#f0c93d", D: "#f28f3b", F: "#d94f4f" };
               const grade = confLetter;
@@ -1276,7 +1281,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{revenueChange !== null ? `${revenueChange.toFixed(1)}%` : "N/A"}</span>
+                              <span>{revenueDisplay}</span>
                               <span>{revenueChange > 0 ? "▲" : revenueChange < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
