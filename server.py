@@ -477,34 +477,44 @@ import math
 async def discovered():
     """Return discovery dataset + meta info with safe fallback."""
     try:
-        # ✅ Prefer filtered file first, fallback to full
-        for file in ["discovered_symbols.json", "discovered_full.json"]:
-            if os.path.exists(file) and os.path.getsize(file) > 5:
-                with open(file, "r") as f:
-                    try:
-                        data = json.load(f)
-                        break
-                    except json.JSONDecodeError:
-                        _log(f"⚠️ Skipping invalid JSON file: {file}")
-                        continue
-        else:
-            _log("⚠️ No discovery data found or valid JSON.")
-            return {"symbols": [], "total_scanned": 0, "after_filters": 0, "displayed": 0}
+        def extract_symbols(raw: Any) -> List[dict]:
+            if isinstance(raw, list):
+                return raw
+            if isinstance(raw, dict):
+                if isinstance(raw.get("symbols"), list):
+                    return raw.get("symbols", [])
 
-        # ✅ Handle both dict and list JSON types
-        if isinstance(data, list):
-            symbols_data = data
-        elif isinstance(data, dict):
-            if "symbols" in data:
-                symbols_data = data.get("symbols", [])
-            else:
                 merged: List[dict] = []
-                for value in data.values():
+                for value in raw.values():
                     if isinstance(value, list):
                         merged.extend(value)
-                symbols_data = merged
-        else:
-            symbols_data = []
+                return merged
+            return []
+
+        symbols_data: List[dict] = []
+        data: Any = None
+
+        files = ["discovered_symbols.json", "discovered_full.json"]
+        for i, file in enumerate(files):
+            if not (os.path.exists(file) and os.path.getsize(file) > 5):
+                continue
+
+            with open(file, "r") as f:
+                try:
+                    candidate = json.load(f)
+                except json.JSONDecodeError:
+                    _log(f"⚠️ Skipping invalid JSON file: {file}")
+                    continue
+
+            extracted = extract_symbols(candidate)
+            if extracted or i == len(files) - 1:
+                data = candidate
+                symbols_data = extracted
+                break
+
+        if data is None:
+            _log("⚠️ No discovery data found or valid JSON.")
+            return {"symbols": [], "total_scanned": 0, "after_filters": 0, "displayed": 0}
 
         valid = []
         for s in symbols_data:
