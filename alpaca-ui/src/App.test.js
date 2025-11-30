@@ -13,6 +13,7 @@ const mockFetch = (url) => {
     if (url.includes("/progress")) return { percent: 0, eta: "N/A", status: "Idle" };
     if (url.includes("/account"))
       return { cash: null, invested: null, buying_power: null, equity: null };
+    if (url.includes("/sms/status")) return { enabled: false };
     return {};
   };
   return Promise.resolve({ ok, json });
