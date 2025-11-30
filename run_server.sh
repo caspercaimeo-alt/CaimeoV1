@@ -31,7 +31,7 @@ if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
   sleep 2
 fi
 
-PORT=${PORT:-8000}
+PORT=${PORT:-5000}
 echo "🚀 Starting FastAPI server (port $PORT)..."
 # If something is already bound to the desired port, stop it
 existing_port=$(lsof -t -i :$PORT 2>/dev/null)
