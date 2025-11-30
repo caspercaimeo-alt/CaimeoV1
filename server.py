@@ -495,7 +495,14 @@ async def discovered():
         if isinstance(data, list):
             symbols_data = data
         elif isinstance(data, dict):
-            symbols_data = data.get("symbols", [])
+            if "symbols" in data:
+                symbols_data = data.get("symbols", [])
+            else:
+                merged: List[dict] = []
+                for value in data.values():
+                    if isinstance(value, list):
+                        merged.extend(value)
+                symbols_data = merged
         else:
             symbols_data = []
 
