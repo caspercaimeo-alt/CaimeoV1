@@ -12,7 +12,7 @@ This project has two parts:
    ```
 3) Env vars (set in the host dashboard):
    - `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY`, `APCA_API_BASE_URL` (paper or live)
-   - `MAX_DAY_TRADES_PER_WEEK` (default 10)
+   - `MAX_DAY_TRADES_PER_WEEK` (default 65)
    - `TRADE_POLL_SEC`, `MIN_TRADE_CONFIDENCE`, etc., as needed
 4) Requirements: Ensure `requirements.txt` is used by the host for install.
 5) CORS: If you use a custom frontend origin, update `CORSMiddleware` in `server.py` to include it (e.g., `https://your-frontend.netlify.app`).

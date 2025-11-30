@@ -29,7 +29,7 @@ MIN_TRADE_CONFIDENCE = os.getenv("MIN_TRADE_CONFIDENCE", "B").upper()
 RISK_PER_TRADE_PCT = float(os.getenv("RISK_PER_TRADE_PCT", "1.0"))  # % of equity
 STOP_LOSS_PCT = float(os.getenv("STOP_LOSS_PCT", "3.0"))
 TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for attached stops
-MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "10"))
+MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "65"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
 
