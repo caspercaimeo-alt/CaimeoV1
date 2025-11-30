@@ -1075,7 +1075,7 @@ function App() {
                 <div
                   style={{
                     display: "inline-block",
-                    marginTop: isMobile ? "10px" : "26px",
+                    marginTop: isMobile ? "10px" : "38px",
                     padding: "13px 26px",
                     borderRadius: "999px",
                     backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
@@ -1106,7 +1106,7 @@ function App() {
                     Stop
                   </button>
                 </div>
-                <p style={{ fontSize: "18px", marginTop: "auto" }}>
+                <p style={{ fontSize: "18px", marginTop: isMobile ? "14px" : "52px" }}>
                   Authenticated:{" "}
                   <span style={{ color: authenticated ? "green" : "red" }}>
                     {authenticated ? "✅" : "❌"}
