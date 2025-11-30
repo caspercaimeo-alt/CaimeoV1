@@ -703,8 +703,8 @@ function App() {
       textAlign: "right",
       padding: isMobile ? "1px 2px 0" : "4px",
       borderBottom: "1px solid #462323",
-      fontSize: isMobile ? "10.5px" : undefined,
-      lineHeight: isMobile ? "1.15" : undefined,
+      fontSize: isMobile ? "9.5px" : undefined,
+      lineHeight: isMobile ? "1.1" : undefined,
       whiteSpace: "nowrap",
       width: "44%",
       verticalAlign: "middle",
@@ -1220,7 +1220,9 @@ function App() {
 
               const revenueDisplay =
                 revenueChange !== null
-                  ? `${(isMobile ? Math.round(revenueChange) : revenueChange.toFixed(1))}%`
+                  ? isMobile
+                    ? `${Math.round(Math.abs(revenueChange))}%`
+                    : `${Math.abs(revenueChange).toFixed(1)}%`
                   : "N/A";
 
               const confLetter = (item.confidence || "F").toUpperCase();
@@ -1267,7 +1269,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{eps !== null ? `${eps.toFixed(1)}%` : "N/A"}</span>
+                              <span>{eps !== null ? `${Math.abs(eps).toFixed(1)}%` : "N/A"}</span>
                               <span>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
@@ -1297,7 +1299,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{pe !== null ? `${pe.toFixed(1)}%` : "N/A"}</span>
+                              <span>{pe !== null ? `${Math.abs(pe).toFixed(1)}%` : "N/A"}</span>
                               <span>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
@@ -1312,7 +1314,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{roundedGrowth !== null ? `${roundedGrowth}%` : "N/A"}</span>
+                              <span>{roundedGrowth !== null ? `${Math.abs(roundedGrowth)}%` : "N/A"}</span>
                               <span>{growth > 0 ? "▲" : growth < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
