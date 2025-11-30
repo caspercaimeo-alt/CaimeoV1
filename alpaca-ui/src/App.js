@@ -35,6 +35,10 @@ function App() {
   const [apiSecret, setApiSecret] = useState("");
   const [msg, setMsg] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
+  const [smsStatus, setSmsStatus] = useState({ enabled: false, phone: null, carrier: null });
+  const [smsPhone, setSmsPhone] = useState("");
+  const [smsNotice, setSmsNotice] = useState("");
+  const [showSmsPrompt, setShowSmsPrompt] = useState(false);
   const [meta, setMeta] = useState({
     total_scanned: 10000,
     after_filters: 0,
@@ -66,6 +70,44 @@ function App() {
       throw new Error(`Request failed: ${response.status}`);
     }
     return response.json();
+  };
+
+  const fetchSmsStatus = async () => {
+    try {
+      const data = await fetchJson("/sms/status");
+      const enabled = Boolean(data.enabled);
+      setSmsStatus({
+        enabled,
+        phone: data.phone || null,
+        carrier: data.carrier || null,
+      });
+      if (authenticated && !enabled) {
+        setShowSmsPrompt(true);
+      }
+      if (enabled) {
+        setShowSmsPrompt(false);
+      }
+    } catch {
+      setSmsStatus({ enabled: false, phone: null, carrier: null });
+    }
+  };
+
+  const submitSmsSignup = async (e) => {
+    e.preventDefault();
+    setSmsNotice("Submitting...");
+    try {
+      const data = await fetchJson("/sms/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: smsPhone }),
+      });
+      setSmsStatus({ enabled: true, phone: data.phone || null, carrier: data.carrier || null });
+      setShowSmsPrompt(false);
+      setSmsNotice("✅ Text alerts enabled");
+    } catch (err) {
+      setSmsNotice("❌ Unable to enable text alerts");
+      console.error(err);
+    }
   };
 
   async function fetchProgress() {
@@ -225,6 +267,16 @@ function App() {
     const interval = setInterval(fetchLogs, 8000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    fetchSmsStatus();
+  }, []);
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchSmsStatus();
+    }
+  }, [authenticated]);
 
   useEffect(() => {
     if (logsBoxRef.current) {
@@ -703,8 +755,8 @@ function App() {
       textAlign: "right",
       padding: isMobile ? "1px 2px 0" : "4px",
       borderBottom: "1px solid #462323",
-      fontSize: isMobile ? "10.5px" : undefined,
-      lineHeight: isMobile ? "1.15" : undefined,
+      fontSize: isMobile ? "9.5px" : undefined,
+      lineHeight: isMobile ? "1.1" : undefined,
       whiteSpace: "nowrap",
       width: "44%",
       verticalAlign: "middle",
@@ -714,6 +766,7 @@ function App() {
       alignItems: "center",
       justifyContent: "flex-end",
       gap: isMobile ? "1px" : "4px",
+      width: "100%",
     },
     confidenceBadge: (color) => ({
       display: "inline-flex",
@@ -909,6 +962,10 @@ function App() {
         justifyContent: "center",
       };
 
+  const textAlertLabel = smsStatus.enabled
+    ? `Text Alerts: ON (${smsStatus.phone || ""})`
+    : "Text Alerts: OFF";
+
   const statusBodyStyle = {
     backgroundColor: "#FCFBF4",
     borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
@@ -1018,10 +1075,89 @@ function App() {
                 ))}
               </div>
             </div>
+            <div
+              style={{
+                position: "absolute",
+                right: isMobile ? "12px" : "18px",
+                top: isMobile ? "10px" : "12px",
+                color: "#FCFBF4",
+                fontWeight: "700",
+                fontSize: isMobile ? "10px" : "14px",
+                textAlign: "right",
+              }}
+            >
+              {textAlertLabel}
+            </div>
           </div>
         </div>
       </div>
       {navOpen && isMobile ? <div className="nav-overlay" onClick={closeNav} /> : null}
+
+      {showSmsPrompt ? (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.35)",
+            zIndex: 60,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "12px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "#FCFBF4",
+              border: "4px solid #462323",
+              borderRadius: isMobile ? "16px" : "10px",
+              width: isMobile ? "92%" : "420px",
+              maxWidth: "520px",
+              boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
+              color: "#462323",
+              padding: isMobile ? "18px 16px 20px" : "20px 24px 28px",
+              textAlign: "center",
+            }}
+          >
+            <h3 style={{ margin: "0 0 10px", fontSize: isMobile ? "22px" : "24px", fontWeight: "900" }}>
+              Sign up for text updates
+            </h3>
+            <p style={{ margin: "0 0 12px", fontSize: isMobile ? "13px" : "14px" }}>
+              Enter your phone number to get CAIMEO trade and order summaries by text.
+            </p>
+            <form onSubmit={submitSmsSignup} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <input
+                type="tel"
+                value={smsPhone}
+                onChange={(e) => setSmsPhone(e.target.value)}
+                placeholder="Phone number"
+                required
+                style={{
+                  ...styles.authInput,
+                  width: "100%",
+                  margin: "0 auto",
+                  textAlign: "center",
+                }}
+              />
+              <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+                <button type="submit" style={{ ...styles.authButton, margin: 0 }}>
+                  Submit
+                </button>
+                <button
+                  type="button"
+                  style={{ ...styles.authButton, margin: 0 }}
+                  onClick={() => setShowSmsPrompt(false)}
+                >
+                  Not now
+                </button>
+              </div>
+            </form>
+            {smsNotice ? (
+              <p style={{ marginTop: "12px", fontWeight: "700" }}>{smsNotice}</p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <div id="auth-section" style={styles.authWrapper} className="auth-wrapper">
         <div style={styles.authBox} className="auth-box">
@@ -1219,7 +1355,9 @@ function App() {
 
               const revenueDisplay =
                 revenueChange !== null
-                  ? `${(isMobile ? Math.round(revenueChange) : revenueChange.toFixed(1))}%`
+                  ? isMobile
+                    ? `${Math.round(Math.abs(revenueChange))}%`
+                    : `${Math.abs(revenueChange).toFixed(1)}%`
                   : "N/A";
 
               const confLetter = (item.confidence || "F").toUpperCase();
@@ -1266,7 +1404,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{eps !== null ? `${eps.toFixed(1)}%` : "N/A"}</span>
+                              <span>{eps !== null ? `${Math.abs(eps).toFixed(1)}%` : "N/A"}</span>
                               <span>{eps > 0 ? "▲" : eps < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
@@ -1296,7 +1434,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{pe !== null ? `${pe.toFixed(1)}%` : "N/A"}</span>
+                              <span>{pe !== null ? `${Math.abs(pe).toFixed(1)}%` : "N/A"}</span>
                               <span>{pe > 0 ? "▲" : pe < 0 ? "▼" : ""}</span>
                             </span>
                           </td>
@@ -1311,7 +1449,7 @@ function App() {
                             }}
                           >
                             <span style={styles.metricValueContent}>
-                              <span>{roundedGrowth !== null ? `${roundedGrowth}%` : "N/A"}</span>
+                              <span>{roundedGrowth !== null ? `${Math.abs(roundedGrowth)}%` : "N/A"}</span>
                               <span>{growth > 0 ? "▲" : growth < 0 ? "▼" : ""}</span>
                             </span>
                           </td>

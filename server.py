@@ -17,12 +17,14 @@ import threading
 import requests
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 import uvicorn
+
+import email_notifier
 
 import stock_discovery  # our discovery engine
 import auto_trader      # auto trading loop
@@ -33,12 +35,17 @@ import auto_trader      # auto trading loop
 BASE_DIR = Path(__file__).resolve().parent
 DISCOVERY_FILE = os.getenv("DISCOVERY_OUTPUT", "discovered_full.json")
 BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
+SMS_CONFIG_PATH = Path(__file__).with_name("sms_config.json")
+NUMVERIFY_API_KEY = os.getenv("NUMVERIFY_API_KEY")
 active_keys: Dict[str, str] = {}
 bot_running = False
 auto_discovery_thread = None
 trading_thread = None
 trading_stop_event = threading.Event()
 first_discovery_done = threading.Event()
+_last_positions: Dict[str, float] = {}
+_last_orders: List[Tuple] = []
+_last_trades: List[Tuple] = []
 
 # shared progress state
 discovery_progress = {
@@ -68,6 +75,70 @@ def _read_logs() -> List[str]:
     except Exception:
         return []
 
+
+def load_sms_config() -> dict:
+    try:
+        if SMS_CONFIG_PATH.exists():
+            with SMS_CONFIG_PATH.open("r") as f:
+                return json.load(f)
+    except Exception as e:
+        _log(f"⚠️ Failed to read sms_config.json: {e}")
+    return {}
+
+
+def save_sms_config(data: dict) -> None:
+    try:
+        tmp = SMS_CONFIG_PATH.with_suffix(".tmp")
+        with tmp.open("w") as f:
+            json.dump(data, f, indent=2)
+        tmp.replace(SMS_CONFIG_PATH)
+    except Exception as e:
+        _log(f"⚠️ Failed to write sms_config.json: {e}")
+
+
+def mask_phone(phone: str) -> str:
+    digits = "".join(filter(str.isdigit, phone or ""))
+    if len(digits) < 4:
+        return "***"
+    tail = digits[-4:]
+    return f"***-***-{tail}"
+
+
+def carrier_to_gateway(carrier: str) -> str:
+    c = (carrier or "").strip().lower()
+    mapping = {
+        "verizon": "vtext.com",
+        "verizon wireless": "vtext.com",
+        "at&t": "txt.att.net",
+        "att": "txt.att.net",
+        "at&t wireless": "txt.att.net",
+        "t-mobile": "tmomail.net",
+        "tmobile": "tmomail.net",
+        "t mobile": "tmomail.net",
+        "sprint": "messaging.sprintpcs.com",
+        "boost mobile": "myboostmobile.com",
+        "google fi": "msg.fi.google.com",
+        "us cellular": "email.uscc.net",
+        "cricket": "sms.cricketwireless.net",
+        "metro pcs": "mymetropcs.com",
+        "metropcs": "mymetropcs.com",
+    }
+    if c in mapping:
+        return mapping[c]
+    # partial contains checks
+    for key, domain in mapping.items():
+        if key in c:
+            return domain
+    raise HTTPException(status_code=400, detail="Unsupported carrier for SMS gateway")
+
+
+def build_sms_email(phone: str, carrier: str) -> str:
+    digits = "".join(filter(str.isdigit, phone))
+    if not digits:
+        raise HTTPException(status_code=400, detail="Invalid phone number")
+    domain = carrier_to_gateway(carrier)
+    return f"{digits}@{domain}"
+
 # ------------------------------------------------------------
 # FastAPI setup
 # ------------------------------------------------------------
@@ -88,6 +159,10 @@ app.add_middleware(
 class AuthBody(BaseModel):
     apiKey: str
     apiSecret: str
+
+
+class SmsSubscribeRequest(BaseModel):
+    phone: constr(strip_whitespace=True, min_length=5)
 
 # ------------------------------------------------------------
 # API Routes
@@ -296,6 +371,50 @@ async def progress():
     })
     return discovery_progress
 
+
+def _ensure_authenticated():
+    if not active_keys:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+
+@app.get("/sms/status")
+async def sms_status():
+    cfg = load_sms_config()
+    enabled = bool(cfg.get("sms_email"))
+    masked = mask_phone(cfg.get("phone", "")) if enabled else None
+    return {"enabled": enabled, "phone": masked, "carrier": cfg.get("carrier")}
+
+
+@app.post("/sms/subscribe")
+async def sms_subscribe(req: SmsSubscribeRequest):
+    _ensure_authenticated()
+    if not NUMVERIFY_API_KEY:
+        raise HTTPException(status_code=400, detail="NUMVERIFY_API_KEY not configured")
+
+    digits = "".join(filter(str.isdigit, req.phone))
+    if not digits:
+        raise HTTPException(status_code=400, detail="Invalid phone number")
+
+    try:
+        resp = requests.get(
+            "http://apilayer.net/api/validate",
+            params={"access_key": NUMVERIFY_API_KEY, "number": digits, "country_code": "US", "format": 1},
+            timeout=10,
+        )
+        data = resp.json()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Carrier lookup failed: {e}")
+
+    if not data or not data.get("valid"):
+        raise HTTPException(status_code=400, detail="Phone number could not be validated")
+
+    carrier = data.get("carrier") or ""
+    sms_email = build_sms_email(digits, carrier)
+    config = {"phone": digits, "carrier": carrier, "sms_email": sms_email, "verified_at": datetime.utcnow().isoformat()}
+    save_sms_config(config)
+    _log(f"✅ SMS alerts configured for {mask_phone(digits)} via {carrier}")
+    return {"enabled": True, "phone": mask_phone(digits), "carrier": carrier}
+
 @app.get("/positions")
 async def positions():
     """Return live positions from Alpaca if credentials are present."""
@@ -326,6 +445,21 @@ async def positions():
                 )
             except Exception:
                 continue
+        global _last_positions
+        changes = []
+        for item in cleaned:
+            sym = item.get("symbol")
+            qty = item.get("qty")
+            if not sym:
+                continue
+            prev_qty = _last_positions.get(sym)
+            if prev_qty is None and qty:
+                changes.append(f"{sym}: 0 → {qty}")
+            elif prev_qty is not None and qty is not None and qty != prev_qty:
+                changes.append(f"{sym}: {prev_qty} → {qty}")
+        _last_positions = {p.get("symbol"): p.get("qty") for p in cleaned if p.get("symbol")}
+        for line in changes:
+            email_notifier.send_position_alert(line)
         _log(f"✅ Positions fetched: {len(cleaned)}")
         return {"positions": cleaned}
     except Exception as e:
@@ -367,6 +501,26 @@ async def orders():
                 )
             except Exception:
                 continue
+        global _last_orders
+        current_set = []
+        for o in cleaned:
+            key = (
+                o.get("symbol"),
+                o.get("side"),
+                o.get("qty"),
+                o.get("type"),
+                o.get("limit_price"),
+                o.get("stop_price"),
+                o.get("status"),
+            )
+            current_set.append(key)
+            if key not in _last_orders:
+                desc = f"{o.get('side', '').upper()} {o.get('qty')} {o.get('symbol')} {o.get('type')}"
+                extra = o.get("limit_price") or o.get("stop_price")
+                if extra:
+                    desc += f" @ {extra}"
+                email_notifier.send_order_alert(desc)
+        _last_orders = current_set
         _log(f"✅ Open orders fetched: {len(cleaned)}")
         return {"orders": cleaned}
     except Exception as e:
@@ -430,6 +584,17 @@ async def trade_history():
                         "status": "closed",
                     }
                 )
+
+        global _last_trades
+        current_trades = []
+        for t in paired_trades:
+            key = (t.get("symbol"), t.get("qty"), t.get("avgPrice"), t.get("soldPrice"), t.get("filled_at"))
+            current_trades.append(key)
+            if key not in _last_trades:
+                email_notifier.send_trade_alert(
+                    f"{t.get('symbol')} qty {t.get('qty')} @ {t.get('avgPrice')} → {t.get('soldPrice')}"
+                )
+        _last_trades = current_trades
 
         _log(f"✅ Trade history fetched: {len(paired_trades)} closed trades")
         return {"trades": paired_trades}
