@@ -16,6 +16,7 @@ import time
 import threading
 import requests
 from datetime import datetime
+from pathlib import Path
 from typing import Dict, Any, List
 
 from fastapi import FastAPI
@@ -29,6 +30,7 @@ import auto_trader      # auto trading loop
 # ------------------------------------------------------------
 # Globals
 # ------------------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parent
 DISCOVERY_FILE = os.getenv("DISCOVERY_OUTPUT", "discovered_full.json")
 BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 active_keys: Dict[str, str] = {}
@@ -477,27 +479,53 @@ import math
 async def discovered():
     """Return discovery dataset + meta info with safe fallback."""
     try:
-        # ✅ Prefer filtered file first, fallback to full
-        for file in ["discovered_symbols.json", "discovered_full.json"]:
-            if os.path.exists(file) and os.path.getsize(file) > 5:
-                with open(file, "r") as f:
-                    try:
-                        data = json.load(f)
-                        break
-                    except json.JSONDecodeError:
-                        _log(f"⚠️ Skipping invalid JSON file: {file}")
-                        continue
-        else:
+        def extract_symbols(raw: Any) -> List[dict]:
+            if isinstance(raw, list):
+                return raw
+            if isinstance(raw, dict):
+                if isinstance(raw.get("symbols"), list):
+                    return raw.get("symbols", [])
+
+                merged: List[dict] = []
+                for value in raw.values():
+                    if isinstance(value, list):
+                        merged.extend(value)
+                return merged
+            return []
+
+        symbols_data: List[dict] = []
+        data: Any = None
+
+        def resolve_file(path_str: str) -> Path:
+            path = Path(path_str)
+            return path if path.is_absolute() else BASE_DIR / path
+
+        configured = os.getenv("DISCOVERED_FILE")
+        files = [configured, DISCOVERY_FILE, "discovered_symbols.json", "discovered_full.json", "discovered_previous.json"]
+        candidates = [f for f in files if f]
+
+        for i, file in enumerate(candidates):
+            path = resolve_file(file)
+            if not (path.exists() and path.stat().st_size > 5):
+                continue
+
+            with path.open("r") as f:
+                try:
+                    candidate = json.load(f)
+                except json.JSONDecodeError:
+                    _log(f"⚠️ Skipping invalid JSON file: {path}")
+                    continue
+
+            extracted = extract_symbols(candidate)
+            if extracted or i == len(candidates) - 1:
+                data = candidate
+                symbols_data = extracted
+                _log(f"✅ Loaded discovery data from {path} ({len(symbols_data)} symbols)")
+                break
+
+        if data is None:
             _log("⚠️ No discovery data found or valid JSON.")
             return {"symbols": [], "total_scanned": 0, "after_filters": 0, "displayed": 0}
-
-        # ✅ Handle both dict and list JSON types
-        if isinstance(data, list):
-            symbols_data = data
-        elif isinstance(data, dict):
-            symbols_data = data.get("symbols", [])
-        else:
-            symbols_data = []
 
         valid = []
         for s in symbols_data:
@@ -559,4 +587,5 @@ async def logs():
 # ------------------------------------------------------------
 if __name__ == "__main__":
     _log("🟢 CAIMEO server starting up...")
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", "5000"))
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)
