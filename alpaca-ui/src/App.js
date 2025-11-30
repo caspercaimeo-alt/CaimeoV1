@@ -526,9 +526,9 @@ function App() {
     },
     authButton: {
       padding: isMobile ? "8px 18px" : "10px 22px",
-      marginTop: isMobile ? "18px" : "10px",
-      marginRight: isMobile ? "auto" : "32px",
-      marginLeft: isMobile ? "auto" : "0",
+      marginTop: isMobile ? "18px" : "16px",
+      marginRight: "auto",
+      marginLeft: "auto",
       border: "3px solid #462323",
       borderRadius: "8px",
       backgroundColor: "#FCFBF4",
@@ -537,7 +537,7 @@ function App() {
       fontSize: isMobile ? "14px" : "16px",
       cursor: "pointer",
       width: isMobile ? "60%" : "auto",
-      display: isMobile ? "block" : "inline-block",
+      display: "block",
     },
     statusBox: {
       ...sharedCardShell,
@@ -1075,7 +1075,7 @@ function App() {
                 <div
                   style={{
                     display: "inline-block",
-                    marginTop: isMobile ? "2px" : "18px",
+                    marginTop: isMobile ? "10px" : "26px",
                     padding: "13px 26px",
                     borderRadius: "999px",
                     backgroundColor: status === "Running" ? "#2ecc71" : "#e74c3c",
