@@ -37,6 +37,7 @@ DISCOVERY_FILE = os.getenv("DISCOVERY_OUTPUT", "discovered_full.json")
 BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 SMS_CONFIG_PATH = Path(__file__).with_name("sms_config.json")
 NUMVERIFY_API_KEY = os.getenv("NUMVERIFY_API_KEY")
+ALPACA_KEYS_PATH = Path(__file__).with_name("alpaca_keys.json")
 active_keys: Dict[str, str] = {}
 bot_running = False
 auto_discovery_thread = None
@@ -94,6 +95,36 @@ def save_sms_config(data: dict) -> None:
         tmp.replace(SMS_CONFIG_PATH)
     except Exception as e:
         _log(f"⚠️ Failed to write sms_config.json: {e}")
+
+
+def load_alpaca_keys() -> Dict[str, str]:
+    try:
+        if ALPACA_KEYS_PATH.exists():
+            with ALPACA_KEYS_PATH.open("r") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    key = data.get("apiKey")
+                    secret = data.get("apiSecret")
+                    if key and secret:
+                        return {"apiKey": key, "apiSecret": secret}
+    except Exception as e:
+        _log(f"⚠️ Failed to read alpaca_keys.json: {e}")
+    return {}
+
+
+def save_alpaca_keys(data: Dict[str, str]) -> None:
+    try:
+        tmp = ALPACA_KEYS_PATH.with_suffix(".tmp")
+        with tmp.open("w") as f:
+            json.dump(data, f, indent=2)
+        tmp.replace(ALPACA_KEYS_PATH)
+    except Exception as e:
+        _log(f"⚠️ Failed to write alpaca_keys.json: {e}")
+
+
+cached_keys = load_alpaca_keys()
+if cached_keys:
+    active_keys.update(cached_keys)
 
 
 def mask_phone(phone: str) -> str:
@@ -187,6 +218,7 @@ async def auth_creds(payload: dict):
             account = r.json()
             active_keys["apiKey"] = key
             active_keys["apiSecret"] = secret
+            save_alpaca_keys(active_keys)
             _log("✅ Alpaca authentication successful.")
             return {"valid": True, "account": account}
         else:
@@ -203,6 +235,11 @@ async def start():
 
     if bot_running:
         return {"status": "already running"}
+
+    if not active_keys:
+        cached = load_alpaca_keys()
+        if cached:
+            active_keys.update(cached)
 
     if not active_keys:
         return {"status": "error", "message": "No valid Alpaca credentials yet."}
@@ -373,6 +410,10 @@ async def progress():
 
 
 def _ensure_authenticated():
+    if not active_keys:
+        cached = load_alpaca_keys()
+        if cached:
+            active_keys.update(cached)
     if not active_keys:
         raise HTTPException(status_code=401, detail="Authentication required")
 
