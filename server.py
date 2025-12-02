@@ -122,6 +122,14 @@ def save_alpaca_keys(data: Dict[str, str]) -> None:
         _log(f"⚠️ Failed to write alpaca_keys.json: {e}")
 
 
+def _load_env_keys() -> Dict[str, str]:
+    key = os.getenv("APCA_API_KEY_ID")
+    secret = os.getenv("APCA_API_SECRET_KEY")
+    if key and secret:
+        return {"apiKey": key, "apiSecret": secret}
+    return {}
+
+
 def _set_alpaca_env(key: str, secret: str) -> None:
     """Propagate validated credentials to environment for all modules."""
     if key:
@@ -133,6 +141,11 @@ def _set_alpaca_env(key: str, secret: str) -> None:
 cached_keys = load_alpaca_keys()
 if cached_keys:
     active_keys.update(cached_keys)
+else:
+    env_keys = _load_env_keys()
+    if env_keys:
+        active_keys.update(env_keys)
+        _log("ℹ️ Loaded Alpaca credentials from environment variables.")
 
 
 def mask_phone(phone: str) -> str:
@@ -250,6 +263,12 @@ async def start():
         if cached:
             active_keys.update(cached)
             _set_alpaca_env(cached.get("apiKey", ""), cached.get("apiSecret", ""))
+        else:
+            env_keys = _load_env_keys()
+            if env_keys:
+                active_keys.update(env_keys)
+                _set_alpaca_env(env_keys.get("apiKey", ""), env_keys.get("apiSecret", ""))
+                _log("ℹ️ Loaded Alpaca credentials from environment for start().")
 
     if not active_keys:
         return {"status": "error", "message": "No valid Alpaca credentials yet."}
@@ -425,8 +444,31 @@ def _ensure_authenticated():
         cached = load_alpaca_keys()
         if cached:
             active_keys.update(cached)
+        else:
+            env_keys = _load_env_keys()
+            if env_keys:
+                active_keys.update(env_keys)
+                _log("ℹ️ Using Alpaca credentials from environment.")
     if not active_keys:
         raise HTTPException(status_code=401, detail="Authentication required")
+
+
+def _hydrate_active_keys() -> None:
+    """Best-effort reload of credentials for non-auth endpoints."""
+    if active_keys:
+        return
+    cached = load_alpaca_keys()
+    if cached:
+        active_keys.update(cached)
+        _set_alpaca_env(cached.get("apiKey", ""), cached.get("apiSecret", ""))
+        _log("ℹ️ Restored Alpaca credentials from cache.")
+        return
+
+    env_keys = _load_env_keys()
+    if env_keys:
+        active_keys.update(env_keys)
+        _set_alpaca_env(env_keys.get("apiKey", ""), env_keys.get("apiSecret", ""))
+        _log("ℹ️ Restored Alpaca credentials from environment.")
 
 
 @app.get("/sms/status")
@@ -470,6 +512,7 @@ async def sms_subscribe(req: SmsSubscribeRequest):
 @app.get("/positions")
 async def positions():
     """Return live positions from Alpaca if credentials are present."""
+    _hydrate_active_keys()
     if not active_keys:
         _log("ℹ️ Positions requested but no active credentials set.")
         return {"positions": []}
@@ -522,6 +565,7 @@ async def positions():
 @app.get("/orders")
 async def orders():
     """Return open orders from Alpaca."""
+    _hydrate_active_keys()
     if not active_keys:
         _log("ℹ️ Orders requested but no active credentials set.")
         return {"orders": []}
@@ -582,6 +626,7 @@ async def orders():
 @app.get("/trade_history")
 async def trade_history():
     """Return recent filled/closed orders from Alpaca."""
+    _hydrate_active_keys()
     if not active_keys:
         _log("ℹ️ Trade history requested but no active credentials set.")
         return {"trades": []}
@@ -657,6 +702,7 @@ async def trade_history():
 @app.get("/account")
 async def account():
     """Return live account balances from Alpaca; fallback to None values."""
+    _hydrate_active_keys()
     if not active_keys:
         _log("ℹ️ Account requested but no active credentials set.")
         return {"cash": None, "invested": None, "portfolio_value": None, "buying_power": None, "equity": None}
