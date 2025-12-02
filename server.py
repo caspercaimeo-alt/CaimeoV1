@@ -482,8 +482,25 @@ async def sms_status():
 @app.post("/sms/subscribe")
 async def sms_subscribe(req: SmsSubscribeRequest):
     _ensure_authenticated()
+    fallback_sms_email = os.getenv("ALERT_SMS_EMAIL")
     if not NUMVERIFY_API_KEY:
-        raise HTTPException(status_code=400, detail="NUMVERIFY_API_KEY not configured")
+        if fallback_sms_email:
+            config = {
+                "phone": digits,
+                "carrier": "unknown",
+                "sms_email": fallback_sms_email,
+                "verified_at": datetime.utcnow().isoformat(),
+            }
+            save_sms_config(config)
+            _log(
+                "✅ SMS alerts configured via fallback ALERT_SMS_EMAIL (NUMVERIFY_API_KEY missing)"
+            )
+            return {"enabled": True, "phone": mask_phone(digits), "carrier": "unknown"}
+
+        raise HTTPException(
+            status_code=400,
+            detail="NUMVERIFY_API_KEY not configured; set it or provide ALERT_SMS_EMAIL for fallback",
+        )
 
     digits = "".join(filter(str.isdigit, req.phone))
     if not digits:
@@ -497,9 +514,33 @@ async def sms_subscribe(req: SmsSubscribeRequest):
         )
         data = resp.json()
     except Exception as e:
+        if fallback_sms_email:
+            config = {
+                "phone": digits,
+                "carrier": "unknown",
+                "sms_email": fallback_sms_email,
+                "verified_at": datetime.utcnow().isoformat(),
+            }
+            save_sms_config(config)
+            _log(
+                "✅ SMS alerts configured via fallback ALERT_SMS_EMAIL after lookup failure"
+            )
+            return {"enabled": True, "phone": mask_phone(digits), "carrier": "unknown"}
         raise HTTPException(status_code=502, detail=f"Carrier lookup failed: {e}")
 
     if not data or not data.get("valid"):
+        if fallback_sms_email:
+            config = {
+                "phone": digits,
+                "carrier": "unknown",
+                "sms_email": fallback_sms_email,
+                "verified_at": datetime.utcnow().isoformat(),
+            }
+            save_sms_config(config)
+            _log(
+                "✅ SMS alerts configured via fallback ALERT_SMS_EMAIL after invalid lookup"
+            )
+            return {"enabled": True, "phone": mask_phone(digits), "carrier": "unknown"}
         raise HTTPException(status_code=400, detail="Phone number could not be validated")
 
     carrier = data.get("carrier") or ""
