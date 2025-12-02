@@ -32,6 +32,7 @@ TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for 
 MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "65"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
+ALLOW_AFTER_HOURS = os.getenv("ALLOW_AFTER_HOURS", "false").lower() == "true"
 
 # Symbols that already have protective exits attached in this session
 ATTACHED_EXITS = set()
@@ -282,6 +283,9 @@ def _market_ready(api: REST) -> bool:
     """Return True if market is open and past the post-open delay."""
     try:
         clock = api.get_clock()
+        if ALLOW_AFTER_HOURS:
+            return True
+
         if not getattr(clock, "is_open", False):
             return False
         now = datetime.now(timezone.utc)
