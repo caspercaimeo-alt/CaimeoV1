@@ -17,6 +17,7 @@ import time
 import json
 import math
 import datetime as dt
+from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 
 # Third-party deps
@@ -34,8 +35,31 @@ except Exception:  # Alpaca optional for discovery-only mode
 # =========================
 # CONFIG
 # =========================
-API_KEY    = os.getenv("APCA_API_KEY_ID")
-API_SECRET = os.getenv("APCA_API_SECRET_KEY")
+ALPACA_KEYS_PATH = Path(__file__).with_name("alpaca_keys.json")
+
+
+def _load_cached_keys() -> Tuple[Optional[str], Optional[str]]:
+    try:
+        if ALPACA_KEYS_PATH.exists():
+            with ALPACA_KEYS_PATH.open("r") as f:
+                data = json.load(f)
+                if isinstance(data, dict):
+                    return data.get("apiKey"), data.get("apiSecret")
+    except Exception:
+        pass
+    return None, None
+
+
+def _current_env_keys() -> Tuple[Optional[str], Optional[str]]:
+    return os.getenv("APCA_API_KEY_ID"), os.getenv("APCA_API_SECRET_KEY")
+
+
+API_KEY, API_SECRET = _current_env_keys()
+if not API_KEY or not API_SECRET:
+    cached_key, cached_secret = _load_cached_keys()
+    API_KEY = API_KEY or cached_key
+    API_SECRET = API_SECRET or cached_secret
+
 BASE_URL   = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 
 DISCOVERY_INTERVAL_MIN = int(os.getenv("DISCOVERY_INTERVAL_MIN", "5"))  # fast for dev
@@ -100,6 +124,14 @@ def _atomic_write_json(path: str, data: dict) -> None:
 
 def init_alpaca():
     """Optional: authenticate Alpaca for later trading hooks."""
+    global API_KEY, API_SECRET
+
+    # Refresh credentials from environment or cached file so late auth works.
+    env_key, env_secret = _current_env_keys()
+    cache_key, cache_secret = _load_cached_keys()
+    API_KEY = env_key or cache_key
+    API_SECRET = env_secret or cache_secret
+
     if REST is None:
         log("ℹ️ Alpaca library not installed; continuing discovery-only.")
         return None

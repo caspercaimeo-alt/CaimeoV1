@@ -96,16 +96,22 @@ function App() {
     e.preventDefault();
     setSmsNotice("Submitting...");
     try {
-      const data = await fetchJson("/sms/subscribe", {
+      const res = await fetch(`${SERVER}/sms/subscribe`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...noCacheHeaders },
         body: JSON.stringify({ phone: smsPhone }),
+        cache: "no-store",
       });
+      const data = await res.json();
+      if (!res.ok) {
+        const reason = data?.detail ? `: ${data.detail}` : "";
+        throw new Error(`Unable to enable text alerts${reason}`);
+      }
       setSmsStatus({ enabled: true, phone: data.phone || null, carrier: data.carrier || null });
       setShowSmsPrompt(false);
       setSmsNotice("✅ Text alerts enabled");
     } catch (err) {
-      setSmsNotice("❌ Unable to enable text alerts");
+      setSmsNotice(`❌ ${err.message || "Unable to enable text alerts"}`);
       console.error(err);
     }
   };
@@ -1134,7 +1140,8 @@ function App() {
                 required
                 style={{
                   ...styles.authInput,
-                  width: "100%",
+                  width: "92%",
+                  maxWidth: "360px",
                   margin: "0 auto",
                   textAlign: "center",
                 }}
