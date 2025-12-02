@@ -122,6 +122,14 @@ def save_alpaca_keys(data: Dict[str, str]) -> None:
         _log(f"⚠️ Failed to write alpaca_keys.json: {e}")
 
 
+def _set_alpaca_env(key: str, secret: str) -> None:
+    """Propagate validated credentials to environment for all modules."""
+    if key:
+        os.environ["APCA_API_KEY_ID"] = key
+    if secret:
+        os.environ["APCA_API_SECRET_KEY"] = secret
+
+
 cached_keys = load_alpaca_keys()
 if cached_keys:
     active_keys.update(cached_keys)
@@ -218,6 +226,7 @@ async def auth_creds(payload: dict):
             account = r.json()
             active_keys["apiKey"] = key
             active_keys["apiSecret"] = secret
+            _set_alpaca_env(key, secret)
             save_alpaca_keys(active_keys)
             _log("✅ Alpaca authentication successful.")
             return {"valid": True, "account": account}
@@ -240,6 +249,7 @@ async def start():
         cached = load_alpaca_keys()
         if cached:
             active_keys.update(cached)
+            _set_alpaca_env(cached.get("apiKey", ""), cached.get("apiSecret", ""))
 
     if not active_keys:
         return {"status": "error", "message": "No valid Alpaca credentials yet."}
@@ -250,6 +260,7 @@ async def start():
 
     key = active_keys.get("apiKey")
     secret = active_keys.get("apiSecret")
+    _set_alpaca_env(key or "", secret or "")
 
     def _start_trading_loop():
         """Start trading thread if not already running."""
