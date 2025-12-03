@@ -1,12 +1,11 @@
-"""Merge all origin codex/* branches into main using GitPython.
-"""
+"""Merge all origin codex/* branches into main using GitPython."""
 from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List
 
-from git import Repo, GitCommandError
+from git import GitCommandError, Repo
 
 REPO_PATH = Path("/home/caspercaimeo/CaimeoV1")
 REMOTE_NAME = "origin"
@@ -20,7 +19,7 @@ def fetch_remote(repo: Repo) -> None:
 
 
 def get_codex_branches(repo: Repo) -> List[str]:
-    branches = []
+    branches: List[str] = []
     prefix = f"{REMOTE_NAME}/codex/"
     for ref in repo.remotes[REMOTE_NAME].refs:
         name = ref.name
@@ -44,7 +43,7 @@ def merge_branch(repo: Repo, branch: str, summary: Dict[str, List[str]]) -> None
     except GitCommandError as exc:
         message = str(exc)
         print(f"Merge failed for {branch}: {message}")
-        if "CONFLICT" in message:
+        if "CONFLICT" in message or "conflict" in message:
             try:
                 repo.git.merge("--abort")
             except GitCommandError:
