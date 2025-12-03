@@ -29,9 +29,10 @@ MIN_TRADE_CONFIDENCE = os.getenv("MIN_TRADE_CONFIDENCE", "B").upper()
 RISK_PER_TRADE_PCT = float(os.getenv("RISK_PER_TRADE_PCT", "1.0"))  # % of equity
 STOP_LOSS_PCT = float(os.getenv("STOP_LOSS_PCT", "3.0"))
 TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for attached stops
-MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "10"))
+MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "65"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
+ALLOW_AFTER_HOURS = os.getenv("ALLOW_AFTER_HOURS", "false").lower() == "true"
 
 # Symbols that already have protective exits attached in this session
 ATTACHED_EXITS = set()
@@ -280,8 +281,40 @@ def _count_entries_this_week(path: str) -> int:
 
 def _market_ready(api: REST) -> bool:
     """Return True if market is open and past the post-open delay."""
+    def _parse_dt(value):
+        if isinstance(value, datetime):
+            return value.astimezone(timezone.utc)
+        if value is None:
+            return None
+        try:
+            return datetime.fromisoformat(str(value)).astimezone(timezone.utc)
+        except Exception:
+            return None
+
     try:
         clock = api.get_clock()
+        if ALLOW_AFTER_HOURS:
+            return True
+
+        now_dt = _parse_dt(getattr(clock, "timestamp", None)) or datetime.now(timezone.utc)
+        open_candidate = (
+            getattr(clock, "next_open", None)
+            or getattr(clock, "open", None)
+            or getattr(clock, "last_open", None)
+        )
+        open_dt = _parse_dt(open_candidate)
+        minutes_since_open = (
+            (now_dt - open_dt).total_seconds() / 60.0 if open_dt else None
+        )
+        minutes_str = f"{minutes_since_open:.1f}" if minutes_since_open is not None else "n/a"
+        _log(
+            f"[ENTRY GUARD] is_open={getattr(clock, 'is_open', False)} "
+            f"now={now_dt.isoformat()} "
+            f"open={open_dt.isoformat() if open_dt else 'unknown'} "
+            f"minutes_since_open={minutes_str} "
+            f"MINUTES_AFTER_OPEN={MINUTES_AFTER_OPEN}"
+        )
+
         if not getattr(clock, "is_open", False):
             return False
         now = datetime.now(timezone.utc)

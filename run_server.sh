@@ -31,15 +31,16 @@ if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
   sleep 2
 fi
 
-echo "🚀 Starting FastAPI server (port 8000)..."
-# If something is already bound to 8000, stop it
-existing8000=$(lsof -t -i :8000 2>/dev/null)
-if [ -n "$existing8000" ]; then
-  echo "⚠️  Port 8000 in use by PID(s): $existing8000 — killing..."
-  echo "$existing8000" | xargs kill -9 2>/dev/null
+PORT=${PORT:-5000}
+echo "🚀 Starting FastAPI server (port $PORT)..."
+# If something is already bound to the desired port, stop it
+existing_port=$(lsof -t -i :$PORT 2>/dev/null)
+if [ -n "$existing_port" ]; then
+  echo "⚠️  Port $PORT in use by PID(s): $existing_port — killing..."
+  echo "$existing_port" | xargs kill -9 2>/dev/null
   sleep 1
 fi
-uvicorn server:app --reload --port 8000 &
+uvicorn server:app --reload --port $PORT &
 SERVER_PID=$!
 
 sleep 5
@@ -60,11 +61,11 @@ sleep 5
 # -----------------------------------------------------
 if command -v open >/dev/null 2>&1; then
   open "http://localhost:3000"
-  open "http://127.0.0.1:8000/docs"
+  open "http://127.0.0.1:$PORT/docs"
   echo "✅ Browser windows opened."
 else
   echo "➡ Please open http://localhost:3000 manually."
-  echo "➡ And FastAPI docs at: http://127.0.0.1:8000/docs"
+  echo "➡ And FastAPI docs at: http://127.0.0.1:$PORT/docs"
 fi
 
 # -----------------------------------------------------
@@ -75,7 +76,7 @@ echo "🤖 Starting trading bot automatically..."
 sleep 3
 
 if command -v curl >/dev/null 2>&1; then
-  curl -s -X POST "http://127.0.0.1:8000/start" >/dev/null
+  curl -s -X POST "http://127.0.0.1:$PORT/start" >/dev/null
   echo "⌛ Verifying trading bot startup..."
 
   MAX_WAIT=15
