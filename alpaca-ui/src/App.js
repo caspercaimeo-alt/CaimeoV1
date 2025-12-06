@@ -987,10 +987,6 @@ function App() {
         justifyContent: "center",
       };
 
-  const textAlertLabel = smsStatus.enabled
-    ? `Text Alerts: ON (${smsStatus.phone || ""})`
-    : "Text Alerts: OFF";
-
   const statusBodyStyle = {
     backgroundColor: "#FCFBF4",
     borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
