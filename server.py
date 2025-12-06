@@ -232,6 +232,8 @@ class AuthBody(BaseModel):
         """Return the first non-empty key/secret values across supported aliases."""
         key = _normalize_cred(self.apiKey) or _normalize_cred(self.api_key)
         secret = _normalize_cred(self.apiSecret) or _normalize_cred(self.api_secret)
+        key = self.apiKey or self.api_key
+        secret = self.apiSecret or self.api_secret
         return key, secret
 
 
