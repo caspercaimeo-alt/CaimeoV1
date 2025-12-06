@@ -1110,6 +1110,9 @@ function App() {
                 gap: "8px",
               }}
             >
+              <span style={{ whiteSpace: "nowrap" }}>
+                Text Alerts
+              </span>
               <span style={{ whiteSpace: "nowrap" }}>Text Alerts</span>
               <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
                 <input
