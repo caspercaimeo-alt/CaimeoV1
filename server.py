@@ -338,7 +338,7 @@ async def start():
 
                 start_time = time.time()
                 symbols = stock_discovery.list_tradable_symbols_via_alpaca(
-                    key, secret, stock_discovery.UNIVERSE_LIMIT, BASE_URL
+                    key, secret, stock_discovery.UNIVERSE_LIMIT
                 )
                 cleaned = stock_discovery.clean_symbols(symbols)
                 total = len(cleaned)
