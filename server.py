@@ -232,6 +232,7 @@ class AuthBody(BaseModel):
         """Return the first non-empty key/secret values across supported aliases."""
         key = _normalize_cred(self.apiKey) or _normalize_cred(self.api_key)
         secret = _normalize_cred(self.apiSecret) or _normalize_cred(self.api_secret)
+        return key, secret
         key = self.apiKey or self.api_key
         secret = self.apiSecret or self.api_secret
         return key, secret
@@ -315,7 +316,7 @@ async def start():
                 daemon=True,
             )
             trading_thread.start()
-            _log("🤖 Auto-trading loop started.")
+            _log("🤖 Auto-trader thread started.")
         else:
             _log("ℹ️ Auto-trading already running.")
 
@@ -439,9 +440,13 @@ async def stop():
 
     if trading_stop_event:
         trading_stop_event.set()
-        _log("🛑 Auto-trading stop requested.")
+        _log("🟥 Auto-trader stop requested from /stop.")
 
     return {"status": "stopped"}
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 @app.get("/status")
 async def status():
@@ -500,6 +505,15 @@ async def sms_status():
     enabled = bool(cfg.get("sms_email"))
     masked = mask_phone(cfg.get("phone", "")) if enabled else None
     return {"enabled": enabled, "phone": masked, "carrier": cfg.get("carrier")}
+
+
+@app.post("/sms/disable")
+async def sms_disable():
+    """Disable SMS alerts by clearing the saved SMS configuration."""
+    disabled_cfg = {"phone": "", "carrier": "", "sms_email": None, "verified_at": None}
+    save_sms_config(disabled_cfg)
+    _log("🚫 SMS alerts disabled via /sms/disable.")
+    return {"enabled": False}
 
 
 @app.post("/sms/subscribe")
@@ -912,5 +926,5 @@ async def logs():
 # ------------------------------------------------------------
 if __name__ == "__main__":
     _log("🟢 CAIMEO server starting up...")
-    port = int(os.getenv("PORT", "5000"))
+    port = int(os.getenv("PORT", "8000"))
     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)
