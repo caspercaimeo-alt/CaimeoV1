@@ -1,26 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
+import { initSocket } from "./socket";
 
-const resolveServerUrl = () => {
-  const prodUrl = "https://api.caspercaimeo.com";
-  const localUrl = "http://localhost:5000";
-
-  if (process.env.REACT_APP_SERVER_URL) return process.env.REACT_APP_SERVER_URL;
-
-  if (typeof window === "undefined") return prodUrl;
-  if (window.__CAIMEO_API_BASE__) return window.__CAIMEO_API_BASE__;
-
-  const host = window.location.hostname || "";
-  const isLocal = host === "localhost" || host === "127.0.0.1";
-  if (isLocal) return localUrl;
-
-  const isProductionHost = host.endsWith("caspercaimeo.com") || host.endsWith("caimeov1.pages.dev");
-  if (isProductionHost) return prodUrl;
-
-  return prodUrl;
-};
-
-const SERVER = resolveServerUrl();
+const SERVER = "http://localhost:8000";
 
 function App() {
   const [logs, setLogs] = useState("");
@@ -36,6 +18,7 @@ function App() {
   const [msg, setMsg] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [smsStatus, setSmsStatus] = useState({ enabled: false, phone: null, carrier: null });
+  const [smsEnabled, setSmsEnabled] = useState(false);
   const [smsPhone, setSmsPhone] = useState("");
   const [smsNotice, setSmsNotice] = useState("");
   const [showSmsPrompt, setShowSmsPrompt] = useState(false);
@@ -60,6 +43,16 @@ function App() {
     Pragma: "no-cache",
   };
 
+  useEffect(() => {
+    const { close } = initSocket({
+      onError: (event) => console.warn("WebSocket connection skipped or failed.", event),
+    });
+
+    return () => {
+      if (typeof close === "function") close();
+    };
+  }, []);
+
   const fetchJson = async (path, options = {}) => {
     const response = await fetch(`${SERVER}${path}`, {
       cache: "no-store",
@@ -81,6 +74,7 @@ function App() {
         phone: data.phone || null,
         carrier: data.carrier || null,
       });
+      setSmsEnabled(enabled);
       if (authenticated && !enabled) {
         setShowSmsPrompt(true);
       }
@@ -108,6 +102,7 @@ function App() {
         throw new Error(`Unable to enable text alerts${reason}`);
       }
       setSmsStatus({ enabled: true, phone: data.phone || null, carrier: data.carrier || null });
+      setSmsEnabled(true);
       setShowSmsPrompt(false);
       setSmsNotice("✅ Text alerts enabled");
     } catch (err) {
@@ -215,6 +210,30 @@ function App() {
     } catch {
       setStatus("Unknown");
     }
+  }
+
+  async function handleSmsToggle(e) {
+    const nextEnabled = e.target.checked;
+    if (!nextEnabled) {
+      try {
+        await fetch(`${SERVER}/sms/disable`, { method: "POST", headers: noCacheHeaders });
+        setSmsEnabled(false);
+        setSmsStatus({ enabled: false, phone: null, carrier: null });
+        setSmsNotice("");
+      } catch (err) {
+        console.error("Failed to disable SMS alerts:", err);
+        setSmsEnabled(true);
+      }
+      return;
+    }
+
+    if (smsStatus.enabled) {
+      setSmsEnabled(true);
+      return;
+    }
+
+    setSmsEnabled(false);
+    setShowSmsPrompt(true);
   }
 
   async function fetchAccount() {
@@ -968,10 +987,6 @@ function App() {
         justifyContent: "center",
       };
 
-  const textAlertLabel = smsStatus.enabled
-    ? `Text Alerts: ON (${smsStatus.phone || ""})`
-    : "Text Alerts: OFF";
-
   const statusBodyStyle = {
     backgroundColor: "#FCFBF4",
     borderRadius: isMobile ? "0 0 18px 18px" : "0 0 10px 10px",
@@ -1090,9 +1105,23 @@ function App() {
                 fontWeight: "700",
                 fontSize: isMobile ? "10px" : "14px",
                 textAlign: "right",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
-              {textAlertLabel}
+              <span style={{ whiteSpace: "nowrap" }}>Text Alerts</span>
+              <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
+                <input
+                  id="smsToggle"
+                  name="smsToggle"
+                  type="checkbox"
+                  checked={smsEnabled}
+                  onChange={handleSmsToggle}
+                  style={{ width: isMobile ? "14px" : "16px", height: isMobile ? "14px" : "16px" }}
+                />
+                <span>{smsEnabled ? "ON" : "OFF"}</span>
+              </label>
             </div>
           </div>
         </div>
@@ -1133,6 +1162,8 @@ function App() {
             </p>
             <form onSubmit={submitSmsSignup} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <input
+                id="smsPhone"
+                name="smsPhone"
                 type="tel"
                 value={smsPhone}
                 onChange={(e) => setSmsPhone(e.target.value)}
@@ -1184,6 +1215,8 @@ function App() {
                 <input
                   style={styles.authInput}
                   className="auth-input"
+                  id="apiKey"
+                  name="apiKey"
                   type="text"
                   placeholder="API Key"
                   value={apiKey}
@@ -1193,6 +1226,8 @@ function App() {
                 <input
                   style={styles.authInput}
                   className="auth-input"
+                  id="apiSecret"
+                  name="apiSecret"
                   type="password"
                   placeholder="API Secret"
                   value={apiSecret}
