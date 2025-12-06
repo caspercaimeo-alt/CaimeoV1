@@ -156,6 +156,13 @@ def mask_phone(phone: str) -> str:
     return f"***-***-{tail}"
 
 
+def normalize_phone(phone: str) -> str:
+    digits = "".join(filter(str.isdigit, phone or ""))
+    if len(digits) < 10:
+        raise HTTPException(status_code=400, detail="Invalid phone number")
+    return digits
+
+
 def carrier_to_gateway(carrier: str) -> str:
     c = (carrier or "").strip().lower()
     mapping = {
@@ -185,9 +192,7 @@ def carrier_to_gateway(carrier: str) -> str:
 
 
 def build_sms_email(phone: str, carrier: str) -> str:
-    digits = "".join(filter(str.isdigit, phone))
-    if not digits:
-        raise HTTPException(status_code=400, detail="Invalid phone number")
+    digits = normalize_phone(phone)
     domain = carrier_to_gateway(carrier)
     return f"{digits}@{domain}"
 
@@ -209,8 +214,19 @@ app.add_middleware(
 # Models
 # ------------------------------------------------------------
 class AuthBody(BaseModel):
-    apiKey: str
-    apiSecret: str
+    apiKey: str | None = None
+    apiSecret: str | None = None
+    # allow snake_case keys from older clients
+    api_key: str | None = None
+    api_secret: str | None = None
+
+    def normalized(self) -> Tuple[str | None, str | None]:
+        """Return the first non-empty key/secret values across supported aliases."""
+        key_raw = self.apiKey or self.api_key
+        secret_raw = self.apiSecret or self.api_secret
+        key = key_raw.strip() if isinstance(key_raw, str) else key_raw
+        secret = secret_raw.strip() if isinstance(secret_raw, str) else secret_raw
+        return key, secret
 
 
 class SmsSubscribeRequest(BaseModel):
@@ -220,10 +236,9 @@ class SmsSubscribeRequest(BaseModel):
 # API Routes
 # ------------------------------------------------------------
 @app.post("/auth")
-async def auth_creds(payload: dict):
+async def auth_creds(payload: AuthBody):
     """Validate Alpaca API credentials dynamically."""
-    key = payload.get("apiKey")
-    secret = payload.get("apiSecret")
+    key, secret = payload.normalized()
     base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 
     if not key or not secret:
@@ -318,7 +333,7 @@ async def start():
 
                 start_time = time.time()
                 symbols = stock_discovery.list_tradable_symbols_via_alpaca(
-                    key, secret, stock_discovery.UNIVERSE_LIMIT
+                    key, secret, stock_discovery.UNIVERSE_LIMIT, BASE_URL
                 )
                 cleaned = stock_discovery.clean_symbols(symbols)
                 total = len(cleaned)
@@ -482,6 +497,8 @@ async def sms_status():
 @app.post("/sms/subscribe")
 async def sms_subscribe(req: SmsSubscribeRequest):
     _ensure_authenticated()
+    digits = normalize_phone(req.phone)
+
     fallback_sms_email = os.getenv("ALERT_SMS_EMAIL")
     if not NUMVERIFY_API_KEY:
         if fallback_sms_email:
@@ -501,10 +518,6 @@ async def sms_subscribe(req: SmsSubscribeRequest):
             status_code=400,
             detail="NUMVERIFY_API_KEY not configured; set it or provide ALERT_SMS_EMAIL for fallback",
         )
-
-    digits = "".join(filter(str.isdigit, req.phone))
-    if not digits:
-        raise HTTPException(status_code=400, detail="Invalid phone number")
 
     try:
         resp = requests.get(
