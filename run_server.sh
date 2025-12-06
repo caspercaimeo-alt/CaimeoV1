@@ -9,6 +9,7 @@ if command -v ulimit >/dev/null 2>&1; then
 fi
 
 export UNIVERSE_LIMIT=10000
+export NUMVERIFY_API_KEY="3e2f3e6c00fdabff70652c51130c8f07"
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
@@ -31,7 +32,7 @@ if pgrep -f "uvicorn server:app" >/dev/null 2>&1; then
   sleep 2
 fi
 
-PORT=${PORT:-5000}
+PORT=${PORT:-8000}
 echo "🚀 Starting FastAPI server (port $PORT)..."
 # If something is already bound to the desired port, stop it
 existing_port=$(lsof -t -i :$PORT 2>/dev/null)

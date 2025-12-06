@@ -1,26 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 
-const resolveServerUrl = () => {
-  const prodUrl = "https://api.caspercaimeo.com";
-  const localUrl = "http://localhost:5000";
-
-  if (process.env.REACT_APP_SERVER_URL) return process.env.REACT_APP_SERVER_URL;
-
-  if (typeof window === "undefined") return prodUrl;
-  if (window.__CAIMEO_API_BASE__) return window.__CAIMEO_API_BASE__;
-
-  const host = window.location.hostname || "";
-  const isLocal = host === "localhost" || host === "127.0.0.1";
-  if (isLocal) return localUrl;
-
-  const isProductionHost = host.endsWith("caspercaimeo.com") || host.endsWith("caimeov1.pages.dev");
-  if (isProductionHost) return prodUrl;
-
-  return prodUrl;
-};
-
-const SERVER = resolveServerUrl();
+const SERVER = "http://localhost:8000";
 
 function App() {
   const [logs, setLogs] = useState("");
