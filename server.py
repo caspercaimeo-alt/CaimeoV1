@@ -77,6 +77,14 @@ def _read_logs() -> List[str]:
         return []
 
 
+def _normalize_cred(value: str | None) -> str | None:
+    """Strip whitespace from a credential value if present."""
+    if isinstance(value, str):
+        trimmed = value.strip()
+        return trimmed or None
+    return value
+
+
 def load_sms_config() -> dict:
     try:
         if SMS_CONFIG_PATH.exists():
@@ -103,8 +111,8 @@ def load_alpaca_keys() -> Dict[str, str]:
             with ALPACA_KEYS_PATH.open("r") as f:
                 data = json.load(f)
                 if isinstance(data, dict):
-                    key = data.get("apiKey")
-                    secret = data.get("apiSecret")
+                    key = _normalize_cred(data.get("apiKey"))
+                    secret = _normalize_cred(data.get("apiSecret"))
                     if key and secret:
                         return {"apiKey": key, "apiSecret": secret}
     except Exception as e:
@@ -123,8 +131,8 @@ def save_alpaca_keys(data: Dict[str, str]) -> None:
 
 
 def _load_env_keys() -> Dict[str, str]:
-    key = os.getenv("APCA_API_KEY_ID")
-    secret = os.getenv("APCA_API_SECRET_KEY")
+    key = _normalize_cred(os.getenv("APCA_API_KEY_ID"))
+    secret = _normalize_cred(os.getenv("APCA_API_SECRET_KEY"))
     if key and secret:
         return {"apiKey": key, "apiSecret": secret}
     return {}
@@ -222,10 +230,8 @@ class AuthBody(BaseModel):
 
     def normalized(self) -> Tuple[str | None, str | None]:
         """Return the first non-empty key/secret values across supported aliases."""
-        key_raw = self.apiKey or self.api_key
-        secret_raw = self.apiSecret or self.api_secret
-        key = key_raw.strip() if isinstance(key_raw, str) else key_raw
-        secret = secret_raw.strip() if isinstance(secret_raw, str) else secret_raw
+        key = _normalize_cred(self.apiKey) or _normalize_cred(self.api_key)
+        secret = _normalize_cred(self.apiSecret) or _normalize_cred(self.api_secret)
         return key, secret
 
 
