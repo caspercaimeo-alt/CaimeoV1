@@ -48,8 +48,10 @@ def _session():
 # ------------------------------------------------------------
 # Load tradable symbols via Alpaca
 # ------------------------------------------------------------
-def list_tradable_symbols_via_alpaca(api_key: str, api_secret: str, limit: int) -> List[str]:
-    base = "https://paper-api.alpaca.markets"
+def list_tradable_symbols_via_alpaca(
+    api_key: str, api_secret: str, limit: int, base_url: str | None = None
+) -> List[str]:
+    base = base_url or os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
     headers = {"APCA-API-KEY-ID": api_key, "APCA-API-SECRET-KEY": api_secret}
     try:
         r = _session().get(f"{base}/v2/assets", headers=headers, timeout=8)
@@ -358,7 +360,9 @@ def strategy_reversal5(symbols: List[str], api_key: str, api_secret: str) -> Lis
 def discover_symbols(api_key: str, api_secret: str) -> Dict[str, List[Dict]]:
     _log(f"🔎 Starting discovery using dynamic Alpaca credentials (limit {UNIVERSE_LIMIT})")
 
-    universe = list_tradable_symbols_via_alpaca(api_key, api_secret, UNIVERSE_LIMIT)
+    universe = list_tradable_symbols_via_alpaca(
+        api_key, api_secret, UNIVERSE_LIMIT, os.getenv("APCA_API_BASE_URL")
+    )
     if not universe:
         _log("⚠️ No symbols from Alpaca — aborting discovery.")
         return {"symbols": []}
