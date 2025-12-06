@@ -214,8 +214,17 @@ app.add_middleware(
 # Models
 # ------------------------------------------------------------
 class AuthBody(BaseModel):
-    apiKey: str
-    apiSecret: str
+    apiKey: str | None = None
+    apiSecret: str | None = None
+    # allow snake_case keys from older clients
+    api_key: str | None = None
+    api_secret: str | None = None
+
+    def normalized(self) -> Tuple[str | None, str | None]:
+        """Return the first non-empty key/secret values across supported aliases."""
+        key = self.apiKey or self.api_key
+        secret = self.apiSecret or self.api_secret
+        return key, secret
 
 
 class SmsSubscribeRequest(BaseModel):
@@ -225,10 +234,9 @@ class SmsSubscribeRequest(BaseModel):
 # API Routes
 # ------------------------------------------------------------
 @app.post("/auth")
-async def auth_creds(payload: dict):
+async def auth_creds(payload: AuthBody):
     """Validate Alpaca API credentials dynamically."""
-    key = payload.get("apiKey")
-    secret = payload.get("apiSecret")
+    key, secret = payload.normalized()
     base = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 
     if not key or not secret:
