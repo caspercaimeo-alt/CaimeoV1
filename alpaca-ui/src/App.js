@@ -1,26 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 
-const resolveServerUrl = () => {
-  const prodUrl = "https://api.caspercaimeo.com";
-  const localUrl = "http://localhost:5000";
-
-  if (process.env.REACT_APP_SERVER_URL) return process.env.REACT_APP_SERVER_URL;
-
-  if (typeof window === "undefined") return prodUrl;
-  if (window.__CAIMEO_API_BASE__) return window.__CAIMEO_API_BASE__;
-
-  const host = window.location.hostname || "";
-  const isLocal = host === "localhost" || host === "127.0.0.1";
-  if (isLocal) return localUrl;
-
-  const isProductionHost = host.endsWith("caspercaimeo.com") || host.endsWith("caimeov1.pages.dev");
-  if (isProductionHost) return prodUrl;
-
-  return prodUrl;
-};
-
-const SERVER = resolveServerUrl();
+const SERVER = "http://localhost:8000";
 
 function App() {
   const [logs, setLogs] = useState("");
@@ -1133,6 +1114,8 @@ function App() {
             </p>
             <form onSubmit={submitSmsSignup} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <input
+                id="smsPhone"
+                name="smsPhone"
                 type="tel"
                 value={smsPhone}
                 onChange={(e) => setSmsPhone(e.target.value)}
@@ -1184,6 +1167,8 @@ function App() {
                 <input
                   style={styles.authInput}
                   className="auth-input"
+                  id="apiKey"
+                  name="apiKey"
                   type="text"
                   placeholder="API Key"
                   value={apiKey}
@@ -1193,6 +1178,8 @@ function App() {
                 <input
                   style={styles.authInput}
                   className="auth-input"
+                  id="apiSecret"
+                  name="apiSecret"
                   type="password"
                   placeholder="API Secret"
                   value={apiSecret}
