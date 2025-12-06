@@ -24,12 +24,13 @@ LOG_FILE = os.getenv("LOG_FILE", "bot_output.log")
 DISCOVERED_FILE = os.getenv("DISCOVERED_FILE", "discovered_full.json")
 BASE_URL = os.getenv("APCA_API_BASE_URL", "https://paper-api.alpaca.markets")
 TRADE_POLL_SEC = int(os.getenv("TRADE_POLL_SEC", "60"))
-MAX_POSITIONS = int(os.getenv("MAX_POSITIONS", "3"))
+MAX_POSITIONS = int(os.getenv("MAX_POSITIONS", "10"))
 MIN_TRADE_CONFIDENCE = os.getenv("MIN_TRADE_CONFIDENCE", "B").upper()
 RISK_PER_TRADE_PCT = float(os.getenv("RISK_PER_TRADE_PCT", "1.0"))  # % of equity
 STOP_LOSS_PCT = float(os.getenv("STOP_LOSS_PCT", "3.0"))
 TRAIL_STOP_PCT = float(os.getenv("TRAIL_STOP_PCT", "6.0"))  # trailing exit for attached stops
-MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "65"))
+MAX_DAY_TRADES_PER_WEEK = int(os.getenv("MAX_DAY_TRADES_PER_WEEK", "50"))
+MAX_DAY_TRADES_PER_DAY = int(os.getenv("MAX_DAY_TRADES_PER_DAY", "10"))
 ENTRY_SLIPPAGE_PCT = float(os.getenv("ENTRY_SLIPPAGE_PCT", "0.3"))  # % above last price for limit
 MINUTES_AFTER_OPEN = int(os.getenv("MINUTES_AFTER_OPEN", "15"))  # wait N minutes after market open
 ALLOW_AFTER_HOURS = os.getenv("ALLOW_AFTER_HOURS", "false").lower() == "true"
@@ -94,6 +95,8 @@ def _load_discovered(path: str) -> List[Dict]:
         symbols = []
 
     cleaned = []
+    skipped_low_conf = 0
+    skipped_no_price = 0
     for row in symbols:
         if not isinstance(row, dict):
             continue
@@ -101,8 +104,10 @@ def _load_discovered(path: str) -> List[Dict]:
         price = row.get("last_price") or row.get("last")
         conf = row.get("confidence")
         if not sym or price is None:
+            skipped_no_price += 1
             continue
         if not _confidence_ok(conf):
+            skipped_low_conf += 1
             continue
         cleaned.append(
             {
@@ -115,6 +120,13 @@ def _load_discovered(path: str) -> List[Dict]:
         )
 
     cleaned.sort(key=lambda x: x.get("score", 0), reverse=True)
+    total = len(symbols) if isinstance(symbols, list) else 0
+    _log(
+        "🔎 Discovered file '"
+        f"{os.path.basename(path)}': total={total}, usable={len(cleaned)}, "
+        f"skipped_low_conf={skipped_low_conf} (min_conf={MIN_TRADE_CONFIDENCE}), "
+        f"skipped_no_price={skipped_no_price}"
+    )
     return cleaned
 
 
@@ -279,6 +291,31 @@ def _count_entries_this_week(path: str) -> int:
         return 0
 
 
+def _count_entries_today(path: str) -> int:
+    """Count trade entries on the current calendar day from trade_events.jsonl."""
+    if not os.path.exists(path):
+        return 0
+    try:
+        now = datetime.now(timezone.utc)
+        today = now.date()
+        count = 0
+        with open(path, "r") as f:
+            for line in f:
+                try:
+                    rec = json.loads(line)
+                    ts = rec.get("ts")
+                    if not ts:
+                        continue
+                    dt = datetime.fromisoformat(ts).astimezone(timezone.utc)
+                    if dt.date() == today and rec.get("event") == "entry_submitted":
+                        count += 1
+                except Exception:
+                    continue
+        return count
+    except Exception:
+        return 0
+
+
 def _market_ready(api: REST) -> bool:
     """Return True if market is open and past the post-open delay."""
     try:
@@ -287,15 +324,21 @@ def _market_ready(api: REST) -> bool:
             return True
 
         if not getattr(clock, "is_open", False):
+            _log("⏸ Market not open (clock.is_open=False); no entries this cycle.")
             return False
         now = datetime.now(timezone.utc)
         open_time_str = getattr(clock, "last_open", None) or getattr(clock, "next_open", None)
         if open_time_str:
             open_time = datetime.fromisoformat(str(open_time_str)).astimezone(timezone.utc)
             if (now - open_time).total_seconds() < MINUTES_AFTER_OPEN * 60:
+                _log(
+                    "⏸ Market open but within MINUTES_AFTER_OPEN="
+                    f"{MINUTES_AFTER_OPEN}; delaying entries."
+                )
                 return False
         return True
     except Exception:
+        _log("⚠️ get_clock() failed; defaulting _market_ready() to True.")
         return True
 
 
@@ -314,6 +357,10 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
     while not stop_event.is_set():
         try:
             symbols = _load_discovered(DISCOVERED_FILE)
+            _log(
+                f"📊 Trade cycle: {len(symbols)} candidate(s) after filters from "
+                f"{os.path.basename(DISCOVERED_FILE)}"
+            )
             if not symbols:
                 _log("⏸ No trade candidates (empty discovery list).")
                 time.sleep(TRADE_POLL_SEC)
@@ -321,12 +368,23 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
 
             # Day-trade cap guardrail (per calendar ISO week)
             week_entries = _count_entries_this_week(trade_logger.TRADE_EVENTS_LOG)
+            day_entries = _count_entries_today(trade_logger.TRADE_EVENTS_LOG)
+            if day_entries >= MAX_DAY_TRADES_PER_DAY:
+                _log(
+                    f"⏸ Daily trade cap reached ({day_entries}/{MAX_DAY_TRADES_PER_DAY} today)."
+                )
+                time.sleep(TRADE_POLL_SEC)
+                continue
             if week_entries >= MAX_DAY_TRADES_PER_WEEK:
                 _log(f"⏸ Day-trade cap reached ({week_entries}/{MAX_DAY_TRADES_PER_WEEK} this week).")
                 time.sleep(TRADE_POLL_SEC)
                 continue
 
             equity, positions, open_orders, position_objs = _current_state(api)
+            _log(
+                f"📈 Account snapshot: equity={equity}, open_positions={len(positions)}, "
+                f"open_orders={len(open_orders)}"
+            )
 
             # Always try to attach exits even if we're waiting for market open.
             try:
@@ -345,7 +403,10 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
             active_count = len(positions) + len(open_orders)
             slots = max(0, MAX_POSITIONS - active_count)
             if slots <= 0:
-                _log("⏸ Position cap reached; waiting for slots to free up.")
+                _log(
+                    f"⏸ Position cap reached; active={active_count}, max={MAX_POSITIONS}. "
+                    "No new entries this cycle."
+                )
                 time.sleep(TRADE_POLL_SEC)
                 continue
 
@@ -357,18 +418,27 @@ def run(stop_event, api_key: str, api_secret: str, base_url: str = BASE_URL) -> 
                 price = row["price"]
 
                 if sym in positions or sym in open_orders:
+                    _log(f"ℹ️ Skipping {sym}: already in positions/orders.")
                     continue
 
                 qty = _calc_qty(price, equity)
                 if qty <= 0:
-                    _log(f"⚠️ Skipping {sym}: could not size position (price={price}, equity={equity}).")
+                    _log(
+                        "⚠️ Skipping "
+                        f"{sym}: could not size position (price={price}, equity={equity}, "
+                        f"risk={RISK_PER_TRADE_PCT}%, sl={STOP_LOSS_PCT}%)."
+                    )
                     continue
 
+                _log(
+                    f"🧮 Candidate {sym}: price={price}, qty={qty}, "
+                    f"slots_left={slots - placed}, strategy={row.get('strategy')}"
+                )
                 if _submit_bracket(api, sym, price, qty, row.get("strategy")):
                     placed += 1
 
             if placed == 0:
-                _log("⏸ No trade action this cycle.")
+                _log("⏸ No trade action this cycle (all candidates filtered or order placement failed).")
 
         except Exception as e:
             _log(f"❌ Trading loop error: {e}")
