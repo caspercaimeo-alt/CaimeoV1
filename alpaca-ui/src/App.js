@@ -1113,6 +1113,7 @@ function App() {
               <span style={{ whiteSpace: "nowrap" }}>
                 Text Alerts
               </span>
+              <span style={{ whiteSpace: "nowrap" }}>Text Alerts</span>
               <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer" }}>
                 <input
                   id="smsToggle"
@@ -1124,6 +1125,7 @@ function App() {
                 />
                 <span>{smsEnabled ? "ON" : "OFF"}</span>
               </label>
+              <span style={{ whiteSpace: "nowrap" }}>{textAlertLabel}</span>
             </div>
           </div>
         </div>
