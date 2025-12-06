@@ -232,6 +232,7 @@ class AuthBody(BaseModel):
         """Return the first non-empty key/secret values across supported aliases."""
         key = _normalize_cred(self.apiKey) or _normalize_cred(self.api_key)
         secret = _normalize_cred(self.apiSecret) or _normalize_cred(self.api_secret)
+        return key, secret
         key = self.apiKey or self.api_key
         secret = self.apiSecret or self.api_secret
         return key, secret
@@ -442,6 +443,10 @@ async def stop():
         _log("🛑 Auto-trading stop requested.")
 
     return {"status": "stopped"}
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
 
 @app.get("/status")
 async def status():
@@ -912,5 +917,5 @@ async def logs():
 # ------------------------------------------------------------
 if __name__ == "__main__":
     _log("🟢 CAIMEO server starting up...")
-    port = int(os.getenv("PORT", "5000"))
+    port = int(os.getenv("PORT", "8000"))
     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)
