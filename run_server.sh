@@ -9,6 +9,7 @@ if command -v ulimit >/dev/null 2>&1; then
 fi
 
 export UNIVERSE_LIMIT=10000
+export NUMVERIFY_API_KEY="3e2f3e6c00fdabff70652c51130c8f07"
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
