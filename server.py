@@ -156,6 +156,13 @@ def mask_phone(phone: str) -> str:
     return f"***-***-{tail}"
 
 
+def normalize_phone(phone: str) -> str:
+    digits = "".join(filter(str.isdigit, phone or ""))
+    if len(digits) < 10:
+        raise HTTPException(status_code=400, detail="Invalid phone number")
+    return digits
+
+
 def carrier_to_gateway(carrier: str) -> str:
     c = (carrier or "").strip().lower()
     mapping = {
@@ -185,9 +192,7 @@ def carrier_to_gateway(carrier: str) -> str:
 
 
 def build_sms_email(phone: str, carrier: str) -> str:
-    digits = "".join(filter(str.isdigit, phone))
-    if not digits:
-        raise HTTPException(status_code=400, detail="Invalid phone number")
+    digits = normalize_phone(phone)
     domain = carrier_to_gateway(carrier)
     return f"{digits}@{domain}"
 
@@ -482,9 +487,7 @@ async def sms_status():
 @app.post("/sms/subscribe")
 async def sms_subscribe(req: SmsSubscribeRequest):
     _ensure_authenticated()
-    digits = "".join(filter(str.isdigit, req.phone))
-    if not digits:
-        raise HTTPException(status_code=400, detail="Invalid phone number")
+    digits = normalize_phone(req.phone)
 
     fallback_sms_email = os.getenv("ALERT_SMS_EMAIL")
     if not NUMVERIFY_API_KEY:
