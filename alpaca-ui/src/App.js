@@ -1122,6 +1122,7 @@ function App() {
                 />
                 <span>{smsEnabled ? "ON" : "OFF"}</span>
               </label>
+              <span style={{ whiteSpace: "nowrap" }}>{textAlertLabel}</span>
             </div>
           </div>
         </div>

@@ -233,6 +233,10 @@ class AuthBody(BaseModel):
         key = _normalize_cred(self.apiKey) or _normalize_cred(self.api_key)
         secret = _normalize_cred(self.apiSecret) or _normalize_cred(self.api_secret)
         return key, secret
+        key = self.apiKey or self.api_key
+        secret = self.apiSecret or self.api_secret
+        return key, secret
+
 
 class SmsSubscribeRequest(BaseModel):
     phone: constr(strip_whitespace=True, min_length=5)
@@ -338,7 +342,7 @@ async def start():
 
                 start_time = time.time()
                 symbols = stock_discovery.list_tradable_symbols_via_alpaca(
-                    key, secret, stock_discovery.UNIVERSE_LIMIT
+                    key, secret, stock_discovery.UNIVERSE_LIMIT, BASE_URL
                 )
                 cleaned = stock_discovery.clean_symbols(symbols)
                 total = len(cleaned)
