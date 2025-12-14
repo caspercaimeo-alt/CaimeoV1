@@ -2,6 +2,7 @@
 # Replace the placeholders below with your tunnel name and credentials path.
 tunnel: caimeo
 credentials-file: /etc/cloudflared/caimeo.json
+credentials-file: /home/pi/.cloudflared/caimeo.json
 
 ingress:
   - hostname: caspercaimeo.com
