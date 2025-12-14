@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Tunnel for CAIMEO
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/etc/cloudflared
+ExecStart=/usr/bin/cloudflared --config /etc/cloudflared/config.yml tunnel run
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

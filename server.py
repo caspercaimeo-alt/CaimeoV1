@@ -25,6 +25,7 @@ from pydantic import BaseModel, constr
 import uvicorn
 
 import email_notifier
+import sms_order_alerts
 
 import stock_discovery  # our discovery engine
 import auto_trader      # auto trading loop
@@ -657,6 +658,7 @@ async def orders():
         )
         r.raise_for_status()
         data = r.json()
+        sms_order_alerts.handle_status_changes(data, _log)
         cleaned = []
         for o in data:
             try:

@@ -1,0 +1,13 @@
+# Cloudflare Tunnel configuration for caspercaimeo.com
+# Replace the placeholders below with your tunnel name and credentials path.
+tunnel: caimeo
+credentials-file: /etc/cloudflared/caimeo.json
+
+ingress:
+  - hostname: caspercaimeo.com
+    service: http://localhost:8080
+  - hostname: www.caspercaimeo.com
+    service: http://localhost:8080
+  - hostname: api.caspercaimeo.com
+    service: http://localhost:8000
+  - service: http_status:404
