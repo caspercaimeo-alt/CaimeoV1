@@ -64,6 +64,9 @@ sudo ln -sf /etc/nginx/sites-available/caspercaimeo.conf /etc/nginx/sites-enable
 sudo nginx -t
 sudo systemctl restart nginx
 ```
+Important: the `/api/` location is defined *before* the SPA fallback. Keep the trailing slash on `proxy_pass` so `/api/foo`
+forwards to `/foo` in FastAPI (no HTML fallbacks). nginx serves the React build at `/home/pi/CaimeoV1/alpaca-ui/build`, proxies
+`/api/` to `http://127.0.0.1:8000/`, and adds `X-CAIMEO-ORIGIN: raspberry-pi` to responses for verification.
 nginx serves the React build at `/home/pi/CaimeoV1/alpaca-ui/build`, proxies `/api/` to `http://127.0.0.1:8000/`, and adds
 `X-CAIMEO-ORIGIN: raspberry-pi` to responses for verification.
 
@@ -129,6 +132,13 @@ sudo systemctl restart nginx
 curl -I https://caspercaimeo.com
 ```
 The response headers should include `X-CAIMEO-ORIGIN: raspberry-pi`.
+- Ensure API routes never return HTML (no `<!DOCTYPE` in responses):
+```bash
+curl -i http://127.0.0.1:8080/api/auth
+curl -i http://127.0.0.1:8080/api/logs
+curl -i https://caspercaimeo.com/api/auth
+```
+All three should return JSON (or FastAPI JSON errors) with `/api/*` routed through nginx to the backend.
 ## 10) Verification
 - Visit https://caspercaimeo.com to load the UI via Cloudflare.
 - Confirm API calls use `/api` or https://api.caspercaimeo.com.
