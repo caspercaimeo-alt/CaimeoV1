@@ -10,5 +10,6 @@ ingress:
   - hostname: www.caspercaimeo.com
     service: http://localhost:8080
   - hostname: api.caspercaimeo.com
+    service: http://localhost:8000
     service: http://127.0.0.1:8000
   - service: http_status:404
