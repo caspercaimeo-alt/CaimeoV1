@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import { initSocket } from "./socket";
 
-const SERVER = "http://localhost:8000";
+const SERVER = process.env.REACT_APP_SERVER || "/api";
 
 function App() {
   const [logs, setLogs] = useState("");
@@ -514,6 +514,7 @@ function App() {
       alignItems: "center",
       justifyContent: "center",
       width: isMobile ? "100%" : "auto",
+      paddingBottom: isMobile ? 0 : 12,
     },
     title: {
       fontSize: isMobile ? "26px" : "32px",
