@@ -36,14 +36,14 @@ def _load_sms_email() -> Optional[str]:
     return None
 
 
-def _send_email(lines: List[str]) -> None:
+def _send_email(lines: List[str]) -> bool:
     sms_email = _load_sms_email()
     if not sms_email:
         print("ℹ️ SMS email not configured; skipping send.")
-        return
+        return False
     if not (ALERT_SMTP_HOST and ALERT_SMTP_USER and ALERT_SMTP_PASS):
         print("ℹ️ SMTP credentials missing; skipping SMS send.")
-        return
+        return False
 
     body = "CAIMEO updates (last 30 min):\n" + "\n".join(f"- {line}" for line in lines)
     if len(body) > MAX_BODY_CHARS:
@@ -61,8 +61,10 @@ def _send_email(lines: List[str]) -> None:
             server.login(ALERT_SMTP_USER, ALERT_SMTP_PASS)
             server.send_message(msg)
         print(f"📨 Sent SMS digest to {sms_email} with {len(lines)} line(s).")
+        return True
     except Exception as e:
         print(f"⚠️ SMS email send failed: {e}")
+        return False
 
 
 def _enqueue(line: str) -> None:
@@ -71,9 +73,15 @@ def _enqueue(line: str) -> None:
     _ALERT_QUEUE.append(line)
     should_send = _LAST_SEND_TS is None or (now - _LAST_SEND_TS) >= DIGEST_SECONDS
     if should_send and _ALERT_QUEUE:
-        _send_email(_ALERT_QUEUE[:])
-        _ALERT_QUEUE.clear()
-        _LAST_SEND_TS = now
+        sent = _send_email(_ALERT_QUEUE[:])
+        if sent:
+            _ALERT_QUEUE.clear()
+            _LAST_SEND_TS = now
+
+
+def send_sms_line(line: str) -> bool:
+    """Send a single SMS line immediately using the configured SMS email gateway."""
+    return _send_email([line])
 
 
 def send_trade_alert(body: str) -> None:
