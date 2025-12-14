@@ -18,6 +18,7 @@ except Exception:  # alpaca may be missing in some envs
     APIError = Exception  # type: ignore
 
 import trade_logger
+import sms_order_alerts
 
 
 LOG_FILE = os.getenv("LOG_FILE", "bot_output.log")
@@ -174,7 +175,7 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
     trail_pct = TRAIL_STOP_PCT
     try:
         limit_price = round(last_price * (1 + ENTRY_SLIPPAGE_PCT / 100), 2)
-        api.submit_order(
+        order = api.submit_order(
             symbol=symbol,
             side="buy",
             type="limit",
@@ -182,13 +183,14 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
             limit_price=limit_price,
             time_in_force="day",
         )
+        sms_order_alerts.handle_order_submit(order, _log)
         _log(
             f"🟢 Limit buy {symbol} qty={qty} @<= {limit_price} (last={last_price}) "
             f"with trailing exit {trail_pct}%"
         )
 
         # Submit a separate trailing-stop sell so profits can run.
-        api.submit_order(
+        exit_order = api.submit_order(
             symbol=symbol,
             side="sell",
             type="trailing_stop",
@@ -196,6 +198,7 @@ def _submit_bracket(api: REST, symbol: str, last_price: float, qty: int, strateg
             trail_percent=trail_pct,
             time_in_force="gtc",
         )
+        sms_order_alerts.handle_order_submit(exit_order, _log)
         trade_logger.append_event(
             {
                 "event": "entry_submitted",
@@ -241,7 +244,7 @@ def _attach_exit_orders(api: REST, positions: List, open_order_symbols: List[str
         trail_pct = TRAIL_STOP_PCT
 
         try:
-            api.submit_order(
+            order = api.submit_order(
                 symbol=sym,
                 side=side,
                 type="trailing_stop",
@@ -249,6 +252,7 @@ def _attach_exit_orders(api: REST, positions: List, open_order_symbols: List[str
                 trail_percent=trail_pct,
                 time_in_force="gtc",
             )
+            sms_order_alerts.handle_order_submit(order, _log)
             ATTACHED_EXITS.add(sym)
             _log(f"🛡️ Attached trailing stop for existing position {sym} qty={qty} trail={trail_pct}%")
             trade_logger.append_event(

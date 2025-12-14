@@ -130,6 +130,12 @@ function App() {
     return columns * 4;
   };
 
+  const textAlertLabel = smsStatus.enabled
+    ? smsStatus.phone
+      ? `to ${smsStatus.phone}`
+      : "Enabled"
+    : "Disabled";
+
   async function fetchDiscovered() {
     try {
       const data = await fetchJson("/discovered");
