@@ -109,6 +109,16 @@ sudo systemctl enable --now cloudflared-caimeo
 The backend service runs `uvicorn server:app --host 127.0.0.1 --port 8000` using the virtualenv at `/home/pi/CaimeoV1/venv` and
 environment from `/home/pi/CaimeoV1/.env`. The Cloudflare service uses `/etc/cloudflared/config.yml` and restarts on failure.
 
+## 10) Updating (production, no dev server)
+The React dev server (npm start on :3000) must NEVER run in production. Always serve the built app via nginx on :8080.
+
+Disable/mask any legacy dev-server unit:
+```bash
+sudo systemctl stop caimeo-frontend
+sudo systemctl disable caimeo-frontend
+sudo systemctl mask caimeo-frontend
+```
+
 ## 10) Updating
 The backend service runs `uvicorn server:app --host 127.0.0.1 --port 8000` using the virtualenv at `/home/pi/CaimeoV1/venv` and environment from `/home/pi/CaimeoV1/.env`. The Cloudflare service uses the config at `/home/pi/CaimeoV1/deploy/cloudflared/config.yml`.
 
@@ -121,6 +131,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 cd alpaca-ui && npm install && npm run build && cd ..
 sudo systemctl restart caimeo-backend
+sudo systemctl restart caimeo-bot
 sudo systemctl restart cloudflared-caimeo
 sudo systemctl restart nginx
 ```
@@ -145,6 +156,17 @@ curl -i https://caspercaimeo.com/api/auth | sed -n '1,30p'
 ```
 All three checks should show JSON (or FastAPI JSON errors) with `/api/*` routed through nginx to the backend and headers including
 `X-CAIMEO-ORIGIN: raspberry-pi-nginx`.
+- Port verification (ensure :3000 is absent, nginx on :8080, uvicorn on :8000):
+```bash
+sudo ss -ltnp | egrep ':3000|:8080|:8000' || true
+```
+- Check service status if anything fails:
+```bash
+sudo systemctl status caimeo-backend
+sudo systemctl status caimeo-bot
+sudo systemctl status cloudflared-caimeo
+sudo journalctl -u caimeo-backend -n 200 --no-pager
+sudo journalctl -u caimeo-bot -n 200 --no-pager
 The response headers should include `X-CAIMEO-ORIGIN: raspberry-pi`.
 - Ensure API routes never return HTML (no `<!DOCTYPE` in responses):
 ```bash
