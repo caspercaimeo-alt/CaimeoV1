@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import { initSocket } from "./socket";
 
-const SERVER = "http://localhost:8000";
+const SERVER = process.env.REACT_APP_SERVER || "/api";
 
 function App() {
   const [logs, setLogs] = useState("");
@@ -129,6 +129,12 @@ function App() {
     const columns = Math.min(6, Math.max(1, Math.floor((width - 60) / 220)));
     return columns * 4;
   };
+
+  const textAlertLabel = smsStatus.enabled
+    ? smsStatus.phone
+      ? `to ${smsStatus.phone}`
+      : "Enabled"
+    : "Disabled";
 
   async function fetchDiscovered() {
     try {
@@ -508,6 +514,7 @@ function App() {
       alignItems: "center",
       justifyContent: "center",
       width: isMobile ? "100%" : "auto",
+      paddingBottom: isMobile ? 0 : 12,
     },
     title: {
       fontSize: isMobile ? "26px" : "32px",
