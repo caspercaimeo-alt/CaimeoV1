@@ -16,3 +16,6 @@ discovered_previous.json
 trade_events.jsonl
 alpaca_keys.json
 sms_order_alert_state.json
+sms_order_alert_state.json
+/node_modules/
+*.log
