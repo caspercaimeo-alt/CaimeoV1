@@ -136,6 +136,8 @@ sudo systemctl restart cloudflared-caimeo
 sudo systemctl restart nginx
 ```
 
+Production frontend is served by nginx from `/home/pi/CaimeoV1/alpaca-ui/build`; caimeo-frontend.service should remain disabled/masked.
+
 ## 11) Verification
 - Visit https://caspercaimeo.com to load the UI via Cloudflare. The UI should call `/api` (tunneled to the Pi).
 - Visit https://api.caspercaimeo.com/docs to confirm the FastAPI docs are reachable through the tunnel.
